@@ -48,7 +48,8 @@ def test_offline_full_pipeline(iso, synth_music):
     indexed_ids = {e.get("id") for e in index}
     used_ids = {s["asset"]["id"] for s in tline["shots"]}
     assert used_ids <= indexed_ids, "用到的素材必须全部进溯源索引"
-    rec = next(e for e in index if e["id"] == used_ids.pop())
+    sample_id = used_ids.pop()                 # 只取一次：pop 不能写在生成器条件里
+    rec = next(e for e in index if e["id"] == sample_id)
     assert rec["used_by"], "溯源记录必须含使用方（项目/镜头/检索词）"
 
 
