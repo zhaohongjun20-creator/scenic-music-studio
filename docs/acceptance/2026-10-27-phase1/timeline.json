@@ -1,0 +1,615 @@
+{
+  "version": 1,
+  "target_s": 60.0,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "fps": 30,
+  "audio": {
+    "file": "C:\\Users\\15804\\ZCodeProject\\bili-autopost-sau\\bgm\\hopeful\\Awake [johnfrantz17].mp3",
+    "offset_s": 20.0,
+    "fade_in_s": 1.5,
+    "fade_out_s": 3.0,
+    "loudnorm": true
+  },
+  "shots": [
+    {
+      "index": 0,
+      "shot_id": "s01",
+      "scene": "mountain sunrise",
+      "mood": "宁静",
+      "role": "opening",
+      "section_index": 0,
+      "start": 0.0,
+      "duration": 4.776,
+      "boundary_hard": true,
+      "beat_locked": null,
+      "transition_out": {
+        "style": "dissolve",
+        "duration": 0.7
+      },
+      "render_length": 5.126,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-26583632",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-26583632.mp4",
+        "url": "https://videos.pexels.com/video-files/26583632/11964893_1920_1080_60fps.mp4",
+        "page_url": "https://www.pexels.com/video/aerial-view-of-the-fog-and-clouds-over-the-mountains-at-sunset-26583632/",
+        "author": "Orhan Pergel",
+        "author_url": "https://www.pexels.com/@skylake",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 59.94,
+        "duration_s": 8.274933,
+        "src_in": 2.758
+      }
+    },
+    {
+      "index": 1,
+      "shot_id": "s02",
+      "scene": "sea coast",
+      "mood": "悠远",
+      "role": "build",
+      "section_index": 1,
+      "start": 4.776,
+      "duration": 3.77,
+      "boundary_hard": true,
+      "beat_locked": null,
+      "transition_out": {
+        "style": "circleopen",
+        "duration": 0.7
+      },
+      "render_length": 4.47,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-39477252",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-39477252.mp4",
+        "url": "https://videos.pexels.com/video-files/39477252/16815041_1920_1080_60fps.mp4",
+        "page_url": "https://www.pexels.com/video/seagull-perched-on-coastal-rock-39477252/",
+        "author": "Rahime Gül",
+        "author_url": "https://www.pexels.com/@rahimegul",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 59.94,
+        "duration_s": 8.008,
+        "src_in": 2.669
+      }
+    },
+    {
+      "index": 2,
+      "shot_id": "s03",
+      "scene": "ocean waves",
+      "mood": "轻柔",
+      "role": "build",
+      "section_index": 1,
+      "start": 8.546,
+      "duration": 3.939,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 8.546,
+        "offset_s": -0.218,
+        "kind": "bar"
+      },
+      "transition_out": {
+        "style": "dissolve",
+        "duration": 0.7
+      },
+      "render_length": 4.639,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-38903453",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-38903453.mp4",
+        "url": "https://videos.pexels.com/video-files/38903453/16543145_1920_1080_60fps.mp4",
+        "page_url": "https://www.pexels.com/video/tranquil-ocean-waves-at-golden-hour-38903453/",
+        "author": "Rahime Gül",
+        "author_url": "https://www.pexels.com/@rahimegul",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 59.94,
+        "duration_s": 10.01,
+        "src_in": 3.337
+      }
+    },
+    {
+      "index": 3,
+      "shot_id": "s04",
+      "scene": "mountain lake",
+      "mood": "恬静",
+      "role": "build",
+      "section_index": 1,
+      "start": 12.485,
+      "duration": 4.094,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 12.485,
+        "offset_s": -0.267,
+        "kind": "onset"
+      },
+      "transition_out": {
+        "style": "circleopen",
+        "duration": 0.7
+      },
+      "render_length": 4.794,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-20698334",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-20698334.mp4",
+        "url": "https://videos.pexels.com/video-files/20698334/20698334-hd_1620_1080_30fps.mp4",
+        "page_url": "https://www.pexels.com/video/blue-lake-timelapse-20698334/",
+        "author": "Eclipse Chasers",
+        "author_url": "https://www.pexels.com/@eclipse-chasers-716719984",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1620,
+        "height": 1080,
+        "fps": 29.97,
+        "duration_s": 13.078333,
+        "src_in": 4.359
+      }
+    },
+    {
+      "index": 4,
+      "shot_id": "s05",
+      "scene": "island",
+      "mood": "宁静",
+      "role": "build",
+      "section_index": 1,
+      "start": 16.579,
+      "duration": 3.917,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 16.579,
+        "offset_s": -0.161,
+        "kind": "bar"
+      },
+      "transition_out": {
+        "style": "circleopen",
+        "duration": 0.7
+      },
+      "render_length": 4.617,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-27489373",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-27489373.mp4",
+        "url": "https://videos.pexels.com/video-files/27489373/12152195_1920_1080_30fps.mp4",
+        "page_url": "https://www.pexels.com/video/an-island-with-a-small-boat-and-a-small-island-27489373/",
+        "author": "Florian Delée",
+        "author_url": "https://www.pexels.com/@florian-delee-209542985",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 29.97,
+        "duration_s": 14.781433,
+        "src_in": 4.927
+      }
+    },
+    {
+      "index": 5,
+      "shot_id": "s06",
+      "scene": "mountain range",
+      "mood": "辽阔",
+      "role": "build",
+      "section_index": 1,
+      "start": 20.496,
+      "duration": 4.504,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 20.496,
+        "offset_s": -0.232,
+        "kind": "onset"
+      },
+      "transition_out": {
+        "style": "circleopen",
+        "duration": 0.7
+      },
+      "render_length": 5.204,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-35284321",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-35284321.mp4",
+        "url": "https://videos.pexels.com/video-files/35284321/14948041_1920_1080_30fps.mp4",
+        "page_url": "https://www.pexels.com/video/dramatic-mountain-clouds-at-sunset-35284321/",
+        "author": "정규송 Nui MALAMA",
+        "author_url": "https://www.pexels.com/@nui-malama-169330637",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 29.97,
+        "duration_s": 9.8098,
+        "src_in": 3.27
+      }
+    },
+    {
+      "index": 6,
+      "shot_id": "s07",
+      "scene": "sea coast",
+      "mood": "悠远",
+      "role": "build",
+      "section_index": 1,
+      "start": 25.0,
+      "duration": 3.483,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 25.0,
+        "offset_s": 0.284,
+        "kind": "onset"
+      },
+      "transition_out": {
+        "style": "dissolve",
+        "duration": 0.7
+      },
+      "render_length": 4.183,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-39477252",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-39477252.mp4",
+        "url": "https://videos.pexels.com/video-files/39477252/16815041_1920_1080_60fps.mp4",
+        "page_url": "https://www.pexels.com/video/seagull-perched-on-coastal-rock-39477252/",
+        "author": "Rahime Gül",
+        "author_url": "https://www.pexels.com/@rahimegul",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 59.94,
+        "duration_s": 8.008,
+        "src_in": 2.669
+      }
+    },
+    {
+      "index": 7,
+      "shot_id": "s08",
+      "scene": "ocean waves",
+      "mood": "轻柔",
+      "role": "build",
+      "section_index": 1,
+      "start": 28.483,
+      "duration": 4.163,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 28.483,
+        "offset_s": -0.221,
+        "kind": "onset"
+      },
+      "transition_out": {
+        "style": "dissolve",
+        "duration": 0.7
+      },
+      "render_length": 4.863,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-38903453",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-38903453.mp4",
+        "url": "https://videos.pexels.com/video-files/38903453/16543145_1920_1080_60fps.mp4",
+        "page_url": "https://www.pexels.com/video/tranquil-ocean-waves-at-golden-hour-38903453/",
+        "author": "Rahime Gül",
+        "author_url": "https://www.pexels.com/@rahimegul",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 59.94,
+        "duration_s": 10.01,
+        "src_in": 3.337
+      }
+    },
+    {
+      "index": 8,
+      "shot_id": "s09",
+      "scene": "mountain lake",
+      "mood": "恬静",
+      "role": "build",
+      "section_index": 1,
+      "start": 32.646,
+      "duration": 4.034,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 32.646,
+        "offset_s": -0.046,
+        "kind": "bar"
+      },
+      "transition_out": {
+        "style": "dissolve",
+        "duration": 0.5
+      },
+      "render_length": 4.634,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-20698334",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-20698334.mp4",
+        "url": "https://videos.pexels.com/video-files/20698334/20698334-hd_1620_1080_30fps.mp4",
+        "page_url": "https://www.pexels.com/video/blue-lake-timelapse-20698334/",
+        "author": "Eclipse Chasers",
+        "author_url": "https://www.pexels.com/@eclipse-chasers-716719984",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1620,
+        "height": 1080,
+        "fps": 29.97,
+        "duration_s": 13.078333,
+        "src_in": 4.359
+      }
+    },
+    {
+      "index": 9,
+      "shot_id": "s10",
+      "scene": "island",
+      "mood": "宁静",
+      "role": "climax",
+      "section_index": 2,
+      "start": 36.68,
+      "duration": 3.297,
+      "boundary_hard": true,
+      "beat_locked": null,
+      "transition_out": {
+        "style": "wipeleft",
+        "duration": 0.5
+      },
+      "render_length": 3.797,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-27489373",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-27489373.mp4",
+        "url": "https://videos.pexels.com/video-files/27489373/12152195_1920_1080_30fps.mp4",
+        "page_url": "https://www.pexels.com/video/an-island-with-a-small-boat-and-a-small-island-27489373/",
+        "author": "Florian Delée",
+        "author_url": "https://www.pexels.com/@florian-delee-209542985",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 29.97,
+        "duration_s": 14.781433,
+        "src_in": 4.927
+      }
+    },
+    {
+      "index": 10,
+      "shot_id": "s11",
+      "scene": "mountain range",
+      "mood": "辽阔",
+      "role": "climax",
+      "section_index": 2,
+      "start": 39.977,
+      "duration": 3.506,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 39.977,
+        "offset_s": -0.034,
+        "kind": "onset"
+      },
+      "transition_out": {
+        "style": "dissolve",
+        "duration": 0.5
+      },
+      "render_length": 4.006,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-35284321",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-35284321.mp4",
+        "url": "https://videos.pexels.com/video-files/35284321/14948041_1920_1080_30fps.mp4",
+        "page_url": "https://www.pexels.com/video/dramatic-mountain-clouds-at-sunset-35284321/",
+        "author": "정규송 Nui MALAMA",
+        "author_url": "https://www.pexels.com/@nui-malama-169330637",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 29.97,
+        "duration_s": 9.8098,
+        "src_in": 3.27
+      }
+    },
+    {
+      "index": 11,
+      "shot_id": "s12",
+      "scene": "sea coast",
+      "mood": "悠远",
+      "role": "climax",
+      "section_index": 2,
+      "start": 43.483,
+      "duration": 3.222,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 43.483,
+        "offset_s": 0.14,
+        "kind": "onset"
+      },
+      "transition_out": {
+        "style": "circleopen",
+        "duration": 0.5
+      },
+      "render_length": 3.722,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-39477252",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-39477252.mp4",
+        "url": "https://videos.pexels.com/video-files/39477252/16815041_1920_1080_60fps.mp4",
+        "page_url": "https://www.pexels.com/video/seagull-perched-on-coastal-rock-39477252/",
+        "author": "Rahime Gül",
+        "author_url": "https://www.pexels.com/@rahimegul",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 59.94,
+        "duration_s": 8.008,
+        "src_in": 2.669
+      }
+    },
+    {
+      "index": 12,
+      "shot_id": "s13",
+      "scene": "ocean waves",
+      "mood": "轻柔",
+      "role": "climax",
+      "section_index": 2,
+      "start": 46.705,
+      "duration": 2.792,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 46.705,
+        "offset_s": 0.031,
+        "kind": "bar"
+      },
+      "transition_out": {
+        "style": "wipeleft",
+        "duration": 0.5
+      },
+      "render_length": 3.292,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-38903453",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-38903453.mp4",
+        "url": "https://videos.pexels.com/video-files/38903453/16543145_1920_1080_60fps.mp4",
+        "page_url": "https://www.pexels.com/video/tranquil-ocean-waves-at-golden-hour-38903453/",
+        "author": "Rahime Gül",
+        "author_url": "https://www.pexels.com/@rahimegul",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 59.94,
+        "duration_s": 10.01,
+        "src_in": 3.337
+      }
+    },
+    {
+      "index": 13,
+      "shot_id": "s14",
+      "scene": "mountain lake",
+      "mood": "恬静",
+      "role": "climax",
+      "section_index": 2,
+      "start": 49.497,
+      "duration": 3.994,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 49.497,
+        "offset_s": -0.509,
+        "kind": "onset"
+      },
+      "transition_out": {
+        "style": "circleopen",
+        "duration": 0.5
+      },
+      "render_length": 4.494,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-20698334",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-20698334.mp4",
+        "url": "https://videos.pexels.com/video-files/20698334/20698334-hd_1620_1080_30fps.mp4",
+        "page_url": "https://www.pexels.com/video/blue-lake-timelapse-20698334/",
+        "author": "Eclipse Chasers",
+        "author_url": "https://www.pexels.com/@eclipse-chasers-716719984",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1620,
+        "height": 1080,
+        "fps": 29.97,
+        "duration_s": 13.078333,
+        "src_in": 4.359
+      }
+    },
+    {
+      "index": 14,
+      "shot_id": "s15",
+      "scene": "island",
+      "mood": "宁静",
+      "role": "climax",
+      "section_index": 2,
+      "start": 53.491,
+      "duration": 3.255,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 53.491,
+        "offset_s": 0.154,
+        "kind": "onset"
+      },
+      "transition_out": {
+        "style": "dissolve",
+        "duration": 0.5
+      },
+      "render_length": 3.755,
+      "revision": 1,
+      "asset": {
+        "id": "pexels-6815991",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-6815991.mp4",
+        "url": "https://videos.pexels.com/video-files/6815991/6815991-hd_2048_988_30fps.mp4",
+        "page_url": "https://www.pexels.com/video/drone-footage-of-an-island-6815991/",
+        "author": "ROMAN ODINTSOV",
+        "author_url": "https://www.pexels.com/@roman-odintsov",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1366,
+        "height": 658,
+        "fps": 29.97,
+        "duration_s": 16.49,
+        "src_in": 5.497
+      },
+      "exclude_assets": [
+        "pexels-27489373"
+      ],
+      "redo_note": "同素材已用两次，换一个"
+    },
+    {
+      "index": 15,
+      "shot_id": "s16",
+      "scene": "mountain range",
+      "mood": "辽阔",
+      "role": "climax",
+      "section_index": 2,
+      "start": 56.746,
+      "duration": 3.254,
+      "boundary_hard": false,
+      "beat_locked": {
+        "snapped_to": 56.746,
+        "offset_s": 0.077,
+        "kind": "bar"
+      },
+      "transition_out": null,
+      "render_length": 3.504,
+      "revision": 0,
+      "asset": {
+        "id": "pexels-35284321",
+        "provider": "pexels",
+        "file": "C:\\Users\\15804\\ZCodeProject\\scenic-music-studio\\materials\\cache\\pexels-35284321.mp4",
+        "url": "https://videos.pexels.com/video-files/35284321/14948041_1920_1080_30fps.mp4",
+        "page_url": "https://www.pexels.com/video/dramatic-mountain-clouds-at-sunset-35284321/",
+        "author": "정규송 Nui MALAMA",
+        "author_url": "https://www.pexels.com/@nui-malama-169330637",
+        "license": "Pexels License",
+        "license_url": "https://www.pexels.com/license/",
+        "width": 1920,
+        "height": 1080,
+        "fps": 29.97,
+        "duration_s": 9.8098,
+        "src_in": 3.27
+      }
+    }
+  ]
+}

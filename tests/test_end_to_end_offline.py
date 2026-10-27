@@ -43,6 +43,14 @@ def test_offline_full_pipeline(iso, synth_music):
     assert len(tline["shots"]) >= 3
     assert all(s["asset"] for s in tline["shots"])
 
+    # 素材溯源索引必须真实落盘（回归：曾因漏 append 恒为空列表）
+    index = load_json(material_manager.INDEX_PATH, [])
+    indexed_ids = {e.get("id") for e in index}
+    used_ids = {s["asset"]["id"] for s in tline["shots"]}
+    assert used_ids <= indexed_ids, "用到的素材必须全部进溯源索引"
+    rec = next(e for e in index if e["id"] == used_ids.pop())
+    assert rec["used_by"], "溯源记录必须含使用方（项目/镜头/检索词）"
+
 
 def test_offline_redo_shot_reuses_cache(iso, synth_music):
     pid, _ = _make(iso, synth_music)

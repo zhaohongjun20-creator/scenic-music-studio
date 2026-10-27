@@ -264,7 +264,11 @@ def assign_assets(pid: str, timeline: dict, cfg: dict, keys: dict,
         asset["src_in"] = _src_in(float(asset["duration_s"]), need)
         recent.append(asset["id"])
         shot["asset"] = asset
-        rec = by_id.setdefault(asset["id"], {**asset, "used_by": []})
+        rec = by_id.get(asset["id"])
+        if rec is None:                       # 新素材：建档案并登记进落盘列表
+            rec = {**asset, "used_by": []}
+            by_id[asset["id"]] = rec
+            index.append(rec)
         rec.setdefault("used_by", []).append(
             {"project": pid, "shot": shot["index"], "scene": shot["scene"]})
 

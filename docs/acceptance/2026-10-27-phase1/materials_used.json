@@ -1,0 +1,190 @@
+{
+  "project": "project-001",
+  "used_assets": [
+    {
+      "id": "pexels-26583632",
+      "provider": "pexels",
+      "page_url": "https://www.pexels.com/video/aerial-view-of-the-fog-and-clouds-over-the-mountains-at-sunset-26583632/",
+      "author": "Orhan Pergel",
+      "author_url": "https://www.pexels.com/@skylake",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "width": 1920,
+      "height": 1080,
+      "fps": 59.94,
+      "duration_s": 8.274933,
+      "used_by": [
+        {
+          "project": "project-001",
+          "shot": 0,
+          "scene": "mountain sunrise"
+        }
+      ]
+    },
+    {
+      "id": "pexels-39477252",
+      "provider": "pexels",
+      "page_url": "https://www.pexels.com/video/seagull-perched-on-coastal-rock-39477252/",
+      "author": "Rahime Gül",
+      "author_url": "https://www.pexels.com/@rahimegul",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "width": 1920,
+      "height": 1080,
+      "fps": 59.94,
+      "duration_s": 8.008,
+      "used_by": [
+        {
+          "project": "project-001",
+          "shot": 1,
+          "scene": "sea coast"
+        },
+        {
+          "project": "project-001",
+          "shot": 6,
+          "scene": "sea coast"
+        },
+        {
+          "project": "project-001",
+          "shot": 11,
+          "scene": "sea coast"
+        }
+      ]
+    },
+    {
+      "id": "pexels-38903453",
+      "provider": "pexels",
+      "page_url": "https://www.pexels.com/video/tranquil-ocean-waves-at-golden-hour-38903453/",
+      "author": "Rahime Gül",
+      "author_url": "https://www.pexels.com/@rahimegul",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "width": 1920,
+      "height": 1080,
+      "fps": 59.94,
+      "duration_s": 10.01,
+      "used_by": [
+        {
+          "project": "project-001",
+          "shot": 2,
+          "scene": "ocean waves"
+        },
+        {
+          "project": "project-001",
+          "shot": 7,
+          "scene": "ocean waves"
+        },
+        {
+          "project": "project-001",
+          "shot": 12,
+          "scene": "ocean waves"
+        }
+      ]
+    },
+    {
+      "id": "pexels-20698334",
+      "provider": "pexels",
+      "page_url": "https://www.pexels.com/video/blue-lake-timelapse-20698334/",
+      "author": "Eclipse Chasers",
+      "author_url": "https://www.pexels.com/@eclipse-chasers-716719984",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "width": 1620,
+      "height": 1080,
+      "fps": 29.97,
+      "duration_s": 13.078333,
+      "used_by": [
+        {
+          "project": "project-001",
+          "shot": 3,
+          "scene": "mountain lake"
+        },
+        {
+          "project": "project-001",
+          "shot": 8,
+          "scene": "mountain lake"
+        },
+        {
+          "project": "project-001",
+          "shot": 13,
+          "scene": "mountain lake"
+        }
+      ]
+    },
+    {
+      "id": "pexels-27489373",
+      "provider": "pexels",
+      "page_url": "https://www.pexels.com/video/an-island-with-a-small-boat-and-a-small-island-27489373/",
+      "author": "Florian Delée",
+      "author_url": "https://www.pexels.com/@florian-delee-209542985",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "width": 1920,
+      "height": 1080,
+      "fps": 29.97,
+      "duration_s": 14.781433,
+      "used_by": [
+        {
+          "project": "project-001",
+          "shot": 4,
+          "scene": "island"
+        },
+        {
+          "project": "project-001",
+          "shot": 9,
+          "scene": "island"
+        }
+      ]
+    },
+    {
+      "id": "pexels-35284321",
+      "provider": "pexels",
+      "page_url": "https://www.pexels.com/video/dramatic-mountain-clouds-at-sunset-35284321/",
+      "author": "정규송 Nui MALAMA",
+      "author_url": "https://www.pexels.com/@nui-malama-169330637",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "width": 1920,
+      "height": 1080,
+      "fps": 29.97,
+      "duration_s": 9.8098,
+      "used_by": [
+        {
+          "project": "project-001",
+          "shot": 5,
+          "scene": "mountain range"
+        },
+        {
+          "project": "project-001",
+          "shot": 10,
+          "scene": "mountain range"
+        },
+        {
+          "project": "project-001",
+          "shot": 15,
+          "scene": "mountain range"
+        }
+      ]
+    },
+    {
+      "id": "pexels-6815991",
+      "provider": "pexels",
+      "page_url": "https://www.pexels.com/video/drone-footage-of-an-island-6815991/",
+      "author": "ROMAN ODINTSOV",
+      "author_url": "https://www.pexels.com/@roman-odintsov",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "width": 1366,
+      "height": 658,
+      "fps": 29.97,
+      "duration_s": 16.49,
+      "used_by": [
+        {
+          "project": "project-001",
+          "shot": 14,
+          "scene": "island"
+        }
+      ]
+    }
+  ]
+}
