@@ -1,0 +1,44 @@
+# 默认创作与渲染配置（brief 可逐期覆盖部分字段）
+
+video:
+  width: 1920
+  height: 1080
+  fps: 30
+  target_duration_s: 60
+  duration_tolerance_s: 1.5      # QC 时长容差
+  contrast: 1.06                 # 全片统一轻调色
+  brightness: 0.02
+  saturation: 1.08
+
+music:
+  fade_in_s: 1.5
+  fade_out_s: 3.0
+  loudnorm: true                 # 单遍响度归一 I=-16 LUFS
+  # 可选：本地曲库 manifest（用于 create 时自动查署名信息）
+  catalogs:
+    - "../bili-autopost-sau/bgm/manifest.json"
+
+timeline:
+  min_shot_s: 2.0                # 任何镜头下限：不为凑节奏产出闪切
+  snap_tolerance_s: 0.6          # 切点吸附节拍/乐句候选的容差
+  snap_penalty: 0.5              # 吸附打分中每秒偏移的罚分
+  beats_per_bar: 4
+  min_sections_boundary_novelty: 0.12
+
+material:
+  min_source_duration_s: 6       # 候选素材最短总长
+  max_height: 1080               # 直链最高分辨率（超出下载慢且需缩放）
+  candidates_per_query: 8        # 每个检索词最多检查的候选数
+  avoid_reuse_shots: 2           # 相邻 N 个镜头内不重复用同一素材
+
+glm:
+  model: "glm-4-flash"          # 前身项目已验证的稳定款
+  temperature: 0.8
+  timeout_s: 60
+  max_tokens: 1500
+
+qc:
+  max_black_seconds: 2.0
+  max_volume_db: -0.5
+  min_mean_volume_db: -45.0
+  min_cut_snap_ratio: 0.8        # 验收线：≥80% 切点落在候选 ±容差内

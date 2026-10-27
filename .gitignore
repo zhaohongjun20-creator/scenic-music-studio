@@ -1,0 +1,15 @@
+# 密钥与本机环境
+.env
+.venv/
+
+# 素材与产物（大文件不进库；许可记录 index.json 除外）
+music/*
+!music/README.md
+materials/*
+!materials/README.md
+projects/*
+!projects/README.md
+
+__pycache__/
+*.pyc
+.pytest_cache/
