@@ -44,6 +44,21 @@ python cli.py publish-prepare project-001   # 生成 upload_info.txt（不投稿
 
 没有 API key 也能跑通全链：`make --offline`（占位素材 + 规则导演）。
 
+## 可解释 · 可追溯 · 可盲评
+
+```bash
+python cli.py report project-001        # 剪辑决策报告：逐镜头为什么这样切、
+                                        # 用哪段素材、配什么转场（output/decision_report.md）
+python cli.py ab-package project-001 project-002 --out ab_experiment/x
+                                        # 两版成片匿名随机化为 版本甲/乙 + 盲评表；
+                                        # 对应关系封存于 projects/.ab_keys/（评完对答案）
+python cli.py prune-cache --max-files 60  # 素材缓存护栏（只保留最新 N 个，库不膨胀）
+```
+
+每次 make 落盘 `projects/<id>/provenance.json`：音乐/brief/风格画像的
+sha1、配置指纹、导演模式、素材清单（含许可）、成片与封面哈希——
+多轮修改后仍可回答"最终成片到底用了什么"。
+
 ## 阶段流水线（manifest.json 记账，断点续跑）
 
 ```
