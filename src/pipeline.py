@@ -10,7 +10,7 @@ materials/render/qc 置为 stale，重跑自动只补受影响的部分）。
 import random
 from pathlib import Path
 
-from src import director, material_manager, music_analyzer, qc, renderer
+from src import director, material_manager, music_analyzer, provenance, qc, renderer
 from src import review as review_mod
 from src import timeline as tl_mod
 from src.jsonio import load_json, save_json
@@ -18,18 +18,21 @@ from src.store import (StoreError, load_manifest, mark_stage, project_dir,
                        set_status, stage_done)
 
 
-def resolve_style(brief: dict, cfg: dict) -> dict | None:
-    """风格画像：brief.style_profile 优先，退回 config style.profile。"""
+def resolve_style(brief: dict, cfg: dict) -> tuple[dict | None, str | None]:
+    """风格画像：brief.style_profile 优先，退回 config style.profile。
+
+    返回 (derived, 路径)，路径供溯源记录。
+    """
     path = brief.get("style_profile") or cfg.get("style", {}).get("profile")
     if not path:
-        return None
+        return None, None
     p = Path(path)
     if not p.is_absolute():
         p = Path(__file__).resolve().parent.parent / path
     prof = load_json(p)
     if not prof or "derived" not in prof:
         raise StoreError(f"风格画像缺失或无 derived 段: {path}")
-    return prof["derived"]
+    return prof["derived"], str(p)
 
 
 def cover_time(tline: dict, music_map: dict) -> float:
@@ -54,7 +57,7 @@ def make(pid: str, cfg: dict, keys: dict, offline: bool = False,
     target_s = float(brief.get("duration_s") or cfg["video"]["target_duration_s"])
     if not brief.get("music"):
         raise StoreError("brief 缺少 music 字段")
-    style = resolve_style(brief, cfg)
+    style, style_path = resolve_style(brief, cfg)
     video_cfg = dict(cfg["video"])
     if style and style.get("video"):
         video_cfg.update({k: v for k, v in style["video"].items()
@@ -128,11 +131,13 @@ def make(pid: str, cfg: dict, keys: dict, offline: bool = False,
                    info={"problems": problems[:5]})
         set_status(pid, manifest, "review" if passed else "draft")
         review_mod.mark_rendered(pid, passed, problems)
+        provenance.write_provenance(pid, pdir, cfg, style_path, tline)
         return {"pid": pid, "qc_passed": passed, "problems": problems,
                 "cut_report": report.get("cut_report"),
                 "final": str(pdir / "output" / "final.mp4")}
 
     report = load_json(pdir / "output" / "qc_report.json", {})
+    provenance.write_provenance(pid, pdir, cfg, style_path, tline)
     return {"pid": pid, "qc_passed": report.get("passed", False),
             "problems": report.get("problems", []),
             "cut_report": report.get("cut_report"),

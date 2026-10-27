@@ -189,6 +189,33 @@ def cmd_analyze_reference(args) -> None:
     print("接入: python cli.py create --style ... --theme ... --music ...")
 
 
+def cmd_report(args) -> None:
+    from src import report as report_mod
+    out = report_mod.write_report(args.project, store.project_dir(args.project))
+    print(f"剪辑决策报告已生成: {out}")
+
+
+def cmd_ab_package(args) -> None:
+    from src import ab_experiment
+    result = ab_experiment.package(args.project_a, args.project_b,
+                                   args.out, note=args.note or "")
+    print(f"盲评包已生成: {result['out']}")
+    print(f"  ├─ 版本甲.mp4 / 版本乙.mp4（身份已匿名随机分配）")
+    print(f"  ├─ 盲评表.md（四维 1-5 分 + 总评）")
+    print(f"  └─ 对应关系已封存（评完再对答案）: {result['key']}")
+    print("请先盲评打分，之后可自行打开 key 文件或让我公布对照结果。")
+
+
+def cmd_prune_cache(args) -> None:
+    from src import material_manager
+    st = material_manager.cache_stats()
+    print(f"当前素材缓存: {st['files']} 个文件，{st['bytes'] / 1e6:.0f}MB")
+    removed = material_manager.prune_cache(args.max_files)
+    st = material_manager.cache_stats()
+    print(f"清理 {removed} 个，保留最新 {args.max_files} 个内："
+          f"{st['files']} 个文件，{st['bytes'] / 1e6:.0f}MB")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(prog="scenic-music-studio",
                                  description="音乐驱动的风景视频生产线")
@@ -247,6 +274,21 @@ def main() -> None:
     p = sub.add_parser("publish-prepare", help="生成上传物料（不投稿）")
     p.add_argument("project")
     p.set_defaults(func=cmd_publish_prepare)
+
+    p = sub.add_parser("report", help="剪辑决策报告（逐镜头为什么这样剪）")
+    p.add_argument("project")
+    p.set_defaults(func=cmd_report)
+
+    p = sub.add_parser("ab-package", help="A/B 盲评实验包（匿名双版本）")
+    p.add_argument("project_a")
+    p.add_argument("project_b")
+    p.add_argument("--out", required=True, help="实验输出目录")
+    p.add_argument("--note", help="实验说明（写入盲评表）")
+    p.set_defaults(func=cmd_ab_package)
+
+    p = sub.add_parser("prune-cache", help="清理素材缓存（保留最新 N 个）")
+    p.add_argument("--max-files", type=int, default=60)
+    p.set_defaults(func=cmd_prune_cache)
 
     args = ap.parse_args()
     try:

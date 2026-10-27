@@ -219,6 +219,29 @@ def _materialize(cand: dict, vid: str) -> dict:
             "duration_s": probe["duration"] or float(v.get("duration", 0))}
 
 
+# ---------------------------------------------------------------- 缓存护栏
+
+def cache_stats() -> dict:
+    files = list(CACHE_DIR.glob("*.mp4"))
+    return {"files": len(files),
+            "bytes": sum(f.stat().st_size for f in files)}
+
+
+def prune_cache(max_files: int) -> int:
+    """按修改时间保留最新 max_files 个缓存素材，返回删除数。
+
+    素材库刻意保持小体积（本机磁盘/内存约束）；被删素材如再次被选
+    中会自动重下。
+    """
+    files = sorted(CACHE_DIR.glob("*.mp4"),
+                   key=lambda f: f.stat().st_mtime, reverse=True)
+    removed = 0
+    for f in files[max(0, max_files):]:
+        f.unlink(missing_ok=True)
+        removed += 1
+    return removed
+
+
 # ---------------------------------------------------------------- 分配
 
 def assign_assets(pid: str, timeline: dict, cfg: dict, keys: dict,

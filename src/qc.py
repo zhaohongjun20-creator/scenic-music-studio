@@ -82,6 +82,20 @@ def cut_alignment_report(timeline: dict, music_map: dict,
             "mean_abs_offset_s": round(sum(within) / len(within), 3) if within else None}
 
 
+def find_duplicate_adjacent(timeline: dict) -> list[str]:
+    """相邻镜头重复使用同一素材同一取材区间（观众能直接看出的硬伤）。"""
+    problems = []
+    shots = timeline.get("shots", [])
+    for a, b in zip(shots, shots[1:]):
+        aa, bb = a.get("asset") or {}, b.get("asset") or {}
+        if aa.get("id") and aa.get("id") == bb.get("id") \
+                and abs(float(aa.get("src_in") or 0) - float(bb.get("src_in") or 0)) < 0.2:
+            problems.append(
+                f"相邻镜头 #{a.get('index')}→#{b.get('index')} 重复同一素材同区间 "
+                f"({aa['id']}，切点 {a.get('start', 0):.1f}s)")
+    return problems
+
+
 def qc_project(project_dir: Path, timeline: dict, music_map: dict,
                cfg: dict) -> tuple[bool, list[str], dict]:
     """全部通过返回 (True, [], report)；报告同时落盘 qc_report.json。"""
@@ -145,6 +159,7 @@ def qc_project(project_dir: Path, timeline: dict, music_map: dict,
     if cut_report["cuts"] and cut_report["ratio"] < float(cfg["qc"]["min_cut_snap_ratio"]):
         problems.append(f"切点吸附率 {cut_report['ratio']:.0%} 低于验收线 "
                         f"{cfg['qc']['min_cut_snap_ratio']:.0%}")
+    problems += find_duplicate_adjacent(timeline)
 
     report = {"passed": not problems, "problems": problems,
               "cut_report": cut_report,

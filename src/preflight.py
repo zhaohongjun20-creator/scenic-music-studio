@@ -33,6 +33,16 @@ def doctor(cfg: dict) -> list[tuple[str, str, str]]:
                  "未配置（导演走规则骨架，发布文案走模板）"))
     rows.append(("music 目录", "ok" if MUSIC_DIR.exists() else "soft",
                  str(MUSIC_DIR)))
+    try:
+        from src.material_manager import CACHE_DIR, cache_stats
+        st = cache_stats()
+        level = "ok" if st["bytes"] <= 2_000_000_000 else "soft"
+        rows.append(("素材缓存", level,
+                     f"{st['files']} 个 / {st['bytes'] / 1e6:.0f}MB"
+                     + ("（偏大，可 python cli.py prune-cache 清理）"
+                        if st["bytes"] > 2_000_000_000 else "")))
+    except Exception:                                        # pragma: no cover
+        rows.append(("素材缓存", "ok", "空"))
     for cat in cfg["music"].get("catalogs", []):
         p = (ROOT / cat).resolve()
         rows.append((f"曲库 {cat}", "ok" if p.exists() else "soft", str(p)))

@@ -73,3 +73,13 @@ def synth_map() -> dict:
     return {"file": "test.wav", "duration_s": 60.0,
             "play_window": {"start": 0.0, "end": 60.0},
             "sections": sections, "cut_candidates": cands}
+
+
+@pytest.fixture
+def iso(tmp_path, monkeypatch):
+    """隔离存储：项目/素材缓存/索引全部落到临时目录。"""
+    from src import material_manager, store
+    monkeypatch.setattr(store, "ROOT", tmp_path)
+    monkeypatch.setattr(material_manager, "CACHE_DIR", tmp_path / "mcache")
+    monkeypatch.setattr(material_manager, "INDEX_PATH", tmp_path / "mindex.json")
+    return tmp_path

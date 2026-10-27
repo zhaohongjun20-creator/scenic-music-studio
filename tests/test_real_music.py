@@ -5,6 +5,9 @@
       单声道 64kbps，来源见 tests/assets/CREDITS.md。
 以下断言全部来自 2026-10-27 的人工核对运行（与整曲分析结果一致：
       build/climax 边界整曲换算 36.68s vs 截段实测 36.66s）。
+
+注意：样本随仓库分发，缺失按 FAIL 处理而非 SKIP——CI 绿灯必须意味着
+真实音乐测试真实执行过（独立验收项，不允许静默跳过）。
 """
 import statistics
 from pathlib import Path
@@ -15,7 +18,10 @@ from src import music_analyzer
 
 ASSET = Path(__file__).parent / "assets" / "awake_excerpt.mp3"
 
-pytestmark = pytest.mark.skipif(not ASSET.exists(), reason="样本未入库")
+if not ASSET.exists():                     # 独立验收项：缺样本 = 失败，不是跳过
+    pytest.fail(
+        "真实音乐样本缺失: tests/assets/awake_excerpt.mp3 "
+        "（应随仓库分发，见 tests/assets/CREDITS.md）")
 
 
 def test_real_music_tempo_and_beats():

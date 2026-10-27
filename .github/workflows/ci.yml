@@ -21,3 +21,5 @@ jobs:
       - run: pip install -r requirements.txt
       # 全离线：合成音乐 + 占位素材，不需要任何 API key 与真实 ffmpeg
       - run: python -m pytest -q
+      # 真实音乐识别是独立验收项：显式执行，CI 绿灯必须包含它（缺失即红）
+      - run: python -m pytest tests/test_real_music.py -v --no-header 2>&1 | tail -20

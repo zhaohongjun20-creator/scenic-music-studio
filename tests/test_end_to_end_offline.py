@@ -2,20 +2,9 @@
 """端到端离线集成测试：合成音乐 → 全链 → 成片 + QC（真实 ffmpeg，无 API）。"""
 from pathlib import Path
 
-import pytest
-
 from src import material_manager, pipeline, review, store
 from src.config import load_config
 from src.jsonio import load_json
-
-
-@pytest.fixture
-def iso(tmp_path, monkeypatch):
-    """隔离存储：项目/素材缓存全部落到临时目录。"""
-    monkeypatch.setattr(store, "ROOT", tmp_path)
-    monkeypatch.setattr(material_manager, "CACHE_DIR", tmp_path / "mcache")
-    monkeypatch.setattr(material_manager, "INDEX_PATH", tmp_path / "mindex.json")
-    return tmp_path
 
 
 def _make(iso, synth_music, duration_s: float = 20.0) -> tuple[str, dict]:
