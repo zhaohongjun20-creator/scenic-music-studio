@@ -7,7 +7,8 @@
 - CI run [40511357813](https://github.com/zhaohongjun20-creator/scenic-music-studio/actions/runs/40511357813)
   （提交 509f109）：`test (3.12)` [success](https://github.com/zhaohongjun20-creator/scenic-music-studio/actions/runs/40511357813/job/122213810665)、
   `test (3.13)` [success](https://github.com/zhaohongjun20-creator/scenic-music-studio/actions/runs/40511357813/job/122213810946)。
-- 本提交起 CI 矩阵扩展为 ubuntu × windows × {3.12, 3.13} 四组。
+- CI run [40514714125](https://github.com/zhaohongjun20-creator/scenic-music-studio/actions/runs/40514714125)
+  （提交 b3017c4，**四组矩阵全绿**）：ubuntu/windows × 3.12/3.13 全部 success。
 - **Windows 本机实测**（win32 10.0.26200 / Python 3.14.3）：`python -m pytest -q` 全绿
   （28 项，含真实 ffmpeg 渲染的端到端出片、局部返工缓存、风格差异、真实音乐识别）。
 
