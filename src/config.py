@@ -34,6 +34,9 @@ DEFAULTS = {
         "model": "glm-4-flash", "temperature": 0.8,
         "timeout_s": 60, "max_tokens": 1500,
     },
+    "style": {
+        "profile": "",
+    },
     "qc": {
         "max_black_seconds": 2.0, "max_volume_db": -0.5,
         "min_mean_volume_db": -45.0, "min_cut_snap_ratio": 0.8,

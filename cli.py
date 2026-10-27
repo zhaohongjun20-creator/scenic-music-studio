@@ -79,6 +79,11 @@ def cmd_create(args) -> None:
         if args.keywords:
             brief["keywords_en"] = [k.strip() for k in args.keywords.split(",")
                                     if k.strip()]
+        if args.style:
+            sp = Path(args.style)
+            if not sp.exists():
+                _die(f"风格画像不存在: {args.style}")
+            brief["style_profile"] = str(sp)
         credit = _music_credit(music, cfg)
         if credit:
             brief["music_credit"] = credit
@@ -167,12 +172,36 @@ def cmd_publish_prepare(args) -> None:
     print("请人工上传后自行回写发布状态。")
 
 
+def cmd_analyze_reference(args) -> None:
+    from src import style_analyzer
+    prof = style_analyzer.build_profile(args.samples, channel=args.channel,
+                                        extra={"mid": args.mid} if args.mid else None)
+    out = Path(args.out)
+    style_analyzer.save_profile(prof, out)
+    for s in prof["samples"]:
+        print(f"{Path(s['file']).name}: {s['shots']}镜/{s['duration_s']}s "
+              f"({s['shots_per_minute']}切/分) 中位{s['len_median']}s "
+              f"硬切{s['hard_cut_frac']:.0%}")
+    a = prof["aggregate"]
+    print(f"聚合: {a['shots_per_minute_median']}切/分 中位 "
+          f"{a['len_median_of_medians']}s 硬切 {a['hard_cut_frac_mean']:.0%}")
+    print(f"已保存 {out}")
+    print("接入: python cli.py create --style ... --theme ... --music ...")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(prog="scenic-music-studio",
                                  description="音乐驱动的风景视频生产线")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("doctor").set_defaults(func=cmd_doctor)
+
+    p = sub.add_parser("analyze-reference", help="参考样片 → 风格画像 JSON")
+    p.add_argument("samples", nargs="+", help="样片视频文件路径")
+    p.add_argument("--channel", required=True, help="参考频道名（仅记录来源）")
+    p.add_argument("--mid", help="参考频道 mid（可选，仅记录）")
+    p.add_argument("--out", default="docs/reference/profile.json")
+    p.set_defaults(func=cmd_analyze_reference)
 
     p = sub.add_parser("create", help="创建项目（创作指令 → brief.json）")
     p.add_argument("--brief", help="brief JSON 文件路径（给了则忽略以下参数）")
@@ -182,6 +211,7 @@ def main() -> None:
     p.add_argument("--mood", default="治愈")
     p.add_argument("--platform", default="bilibili")
     p.add_argument("--keywords", help="英文检索词，逗号分隔（可选）")
+    p.add_argument("--style", help="风格画像 JSON 路径（reference_profile）")
     p.add_argument("--seed", type=int, help="随机种子（转场选择可复现）")
     p.set_defaults(func=cmd_create)
 

@@ -13,3 +13,5 @@ projects/*
 __pycache__/
 *.pyc
 .pytest_cache/
+reference/samples/
+reference/*.mp4

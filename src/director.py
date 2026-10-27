@@ -15,6 +15,7 @@ import time
 
 from src.glm_client import chat_json_ex
 from src.music_analyzer import window_sections
+from src.timeline import get_role_shot_len
 
 # 主题 → Pexels 英文检索词池（brief.keywords_en 可整体覆盖）
 THEME_KEYWORDS = {
@@ -41,10 +42,6 @@ FALLBACK_ROLE = "build"
 
 MOTION_HINTS = {"aerial", "push", "pan", "static"}
 
-# 各角色单镜头参考时长中值（与 timeline.ROLE_SHOT_LEN 一致的经验值）
-_ROLE_MID = {"opening": 4.75, "build": 4.0, "climax": 3.3,
-             "settle": 5.25, "ending": 5.75}
-
 
 def _keywords_for(brief: dict) -> list[str]:
     kws = brief.get("keywords_en")
@@ -57,20 +54,22 @@ def _keywords_for(brief: dict) -> list[str]:
     return DEFAULT_KEYWORDS
 
 
-def _shot_count(section_dur: float, role: str, min_shot_s: float) -> int:
-    lo, hi = {"opening": (3.5, 6.0), "build": (3.0, 5.0), "climax": (2.4, 4.2),
-              "settle": (4.0, 6.5), "ending": (4.5, 7.0)}.get(
-        role, (3.0, 5.0))
+def _shot_count(section_dur: float, role: str, min_shot_s: float,
+                role_len: dict) -> int:
+    lo, hi = role_len.get(role, role_len[FALLBACK_ROLE])
     k = max(1, round(section_dur / ((lo + hi) / 2)))
-    return min(k, max(1, int(section_dur // min_shot_s)))
+    return min(k, max(1, int(section_dur // max(min_shot_s, 0.1))))
 
 
 def _rule_shots(sections: list[dict], keywords: list[str],
-                min_shot_s: float) -> list[dict]:
+                min_shot_s: float, role_len: dict | None = None) -> list[dict]:
     """规则检索词：关键词池 × 角色修饰方向轮转，相邻镜头天然不同。"""
+    role_len = role_len or get_role_shot_len()
     sb_sections, g = [], 0
     for sec in sections:
-        k = _shot_count(sec["end"] - sec["start"], sec["role"], min_shot_s)
+        k = _shot_count(sec["end"] - sec["start"], sec["role"], min_shot_s,
+                        role_len)
+        lo, hi = role_len.get(sec["role"], role_len[FALLBACK_ROLE])
         mods = ROLE_MODIFIERS.get(sec["role"], ROLE_MODIFIERS[FALLBACK_ROLE])
         shots = []
         for j in range(k):
@@ -83,7 +82,8 @@ def _rule_shots(sections: list[dict], keywords: list[str],
                 else "static",
                 "mood_zh": {"opening": "舒展", "build": "递进", "climax": "壮阔",
                             "settle": "舒缓", "ending": "余韵"}.get(sec["role"], "自然"),
-                "duration_hint": round((sec["end"] - sec["start"]) / k, 3),
+                "duration_hint": round(min((lo + hi) / 2,
+                                           (sec["end"] - sec["start"]) / k), 3),
             })
             g += 1
         sb_sections.append({"index": sec["index"], "role": sec["role"],
@@ -154,12 +154,18 @@ def _glm_prompt(brief: dict, sections: list[dict], sb_sections: list[dict],
 
 
 def plan_storyboard(brief: dict, music_map: dict, cfg: dict,
-                    api_key: str = "") -> dict:
-    """生成 storyboard dict。GLM 不可用或输出不合法时整体走规则骨架。"""
+                    api_key: str = "", style: dict | None = None) -> dict:
+    """生成 storyboard dict。GLM 不可用或输出不合法时整体走规则骨架。
+
+    style（reference_profile.derived）驱动角色镜头区间与最短镜头下限。
+    """
+    role_len = get_role_shot_len(style)
     min_shot_s = float(cfg["timeline"]["min_shot_s"])
+    if style and style.get("min_shot_s"):
+        min_shot_s = max(float(style["min_shot_s"]), 1.0)
     sections = window_sections(music_map)
     keywords = _keywords_for(brief)
-    sb_sections = _rule_shots(sections, keywords, min_shot_s)
+    sb_sections = _rule_shots(sections, keywords, min_shot_s, role_len)
 
     mode, model, note = "rules", None, ""
     if api_key:

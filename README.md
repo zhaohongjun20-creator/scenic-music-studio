@@ -66,3 +66,18 @@ QC 是确定性闸门：规格/时长 ±1.5s/静音/削波/黑帧/封面/时间�
 ```bash
 python -m pytest -q        # 全离线：合成音乐验证分析器、时间轴不变量、端到端出片
 ```
+
+## 风格画像（照着某个 UP 的节奏剪）
+
+```bash
+# 1 下载参考样片到本地（仅自用分析，不入库）——放到 reference/samples/
+# 2 生成画像：量化镜头时长/切镜密度/硬切占比/色彩，输出剪辑参数建议
+python cli.py analyze-reference reference/samples/a.mp4 reference/samples/b.mp4 \
+    --channel 频道名 --out docs/reference/xxx.json
+# 3 按该风格建项目（角色镜头区间/最短镜头/硬切主导转场全部随画像走）
+python cli.py create --style docs/reference/xxx.json --theme ... --music ...
+```
+
+已内置画像：`docs/reference/weimeifengjingxian.json`（唯美风景线，292.7 万粉；
+2 支样片实测 ≈16 切/分、镜头中位 2.6s、硬切 79% → 23 镜/60s、段内 0.13s 快切、
+仅段落边界柔和转场）。样片仅用于剪辑规律分析，不复制其画面与音乐。

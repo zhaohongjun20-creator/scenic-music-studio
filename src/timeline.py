@@ -24,6 +24,20 @@ ROLE_SHOT_LEN = {
     "ending": (4.5, 7.0),
 }
 
+# 风格画像可覆盖的下限：再快也不产出低于 1s 的闪切
+ABS_MIN_SHOT_S = 1.0
+
+
+def get_role_shot_len(style: dict | None = None) -> dict[str, tuple[float, float]]:
+    """角色镜头区间：默认基线 ← 风格画像（reference_profile.derived.role_shot_len）。"""
+    if not style:
+        return dict(ROLE_SHOT_LEN)
+    out = {}
+    for role, (lo, hi) in ROLE_SHOT_LEN.items():
+        ov = (style.get("role_shot_len") or {}).get(role)
+        out[role] = (float(ov[0]), float(ov[1])) if ov else (lo, hi)
+    return out
+
 # 转场按切进镜头所属段落的角色选池（必须是 ffmpeg xfade 合法样式）
 ROLE_TRANSITIONS = {
     "opening": ["fade", "dissolve"],
@@ -79,10 +93,17 @@ def _snap_cut(t: float, candidates: list[dict], tol: float,
 
 def plan_from_storyboard(storyboard: dict, music_map: dict,
                          cfg_timeline: dict, video_cfg: dict,
-                         rng=None) -> dict:
-    """生成 timeline dict（asset 字段留空，由素材管理器填充）。"""
+                         rng=None, style: dict | None = None) -> dict:
+    """生成 timeline dict（asset 字段留空，由素材管理器填充）。
+
+    style（reference_profile.derived）可覆盖：角色镜头区间、最短镜头、
+    转场策略（cut_dominant：段内切点用 ~4 帧快切，仅段落边界保留柔和转场）。
+    """
     rng = rng or random
+    role_len = get_role_shot_len(style)
     min_s = float(cfg_timeline["min_shot_s"])
+    if style and style.get("min_shot_s"):
+        min_s = max(float(style["min_shot_s"]), ABS_MIN_SHOT_S)
     tol = float(cfg_timeline["snap_tolerance_s"])
     penalty = float(cfg_timeline["snap_penalty"])
 
@@ -154,13 +175,24 @@ def plan_from_storyboard(storyboard: dict, music_map: dict,
     slots[-1]["duration"] = round(target_s - slots[-1]["start"], 6)
 
     # 转场与渲染长度
+    policy = (style or {}).get("transition_policy") or {}
+    cut_dominant = policy.get("mode") == "cut_dominant"
+    soft_pool = policy.get("soft_pool") or ["fade", "dissolve"]
+    soft_s = float(policy.get("soft_transition_s", 0.5))
     trans = [None]        # trans[i] = 切进镜头 i 的转场（i=0 无）
     for i in range(1, len(slots)):
         role = slots[i]["role"]
-        pool = ROLE_TRANSITIONS.get(role, ROLE_TRANSITIONS[FALLBACK_ROLE])
-        trans.append({"style": rng.choice(pool),
-                      "duration": float(ROLE_TRANSITION_S.get(
-                          role, ROLE_TRANSITION_S[FALLBACK_ROLE]))})
+        if cut_dominant:
+            if slots[i]["boundary_hard"]:       # 段落边界保留柔和转场
+                trans.append({"style": rng.choice(soft_pool),
+                              "duration": soft_s})
+            else:                               # 段内切点：4 帧快切≈硬切
+                trans.append({"style": "fade", "duration": 0.13})
+        else:
+            pool = ROLE_TRANSITIONS.get(role, ROLE_TRANSITIONS[FALLBACK_ROLE])
+            trans.append({"style": rng.choice(pool),
+                          "duration": float(ROLE_TRANSITION_S.get(
+                              role, ROLE_TRANSITION_S[FALLBACK_ROLE]))})
     for i, s in enumerate(slots):
         s["transition_out"] = trans[i + 1] if i + 1 < len(slots) else None
         t_in = trans[i]["duration"] if i > 0 else 0.0
@@ -172,6 +204,8 @@ def plan_from_storyboard(storyboard: dict, music_map: dict,
     return {
         "version": 1,
         "target_s": target_s,
+        "min_shot_s": min_s,
+        "style_applied": bool(style),
         "resolution": [int(video_cfg["width"]), int(video_cfg["height"])],
         "fps": int(video_cfg["fps"]),
         "audio": {
@@ -188,7 +222,7 @@ def plan_from_storyboard(storyboard: dict, music_map: dict,
 def validate_timeline(timeline: dict, cfg_timeline: dict) -> list[str]:
     """时间轴不变量检查（测试与 QC 共用）。返回问题列表，空即通过。"""
     problems = []
-    min_s = float(cfg_timeline["min_shot_s"])
+    min_s = float(timeline.get("min_shot_s") or cfg_timeline["min_shot_s"])
     shots = timeline["shots"]
     if not shots:
         return ["时间轴没有镜头"]

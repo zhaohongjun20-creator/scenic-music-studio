@@ -37,6 +37,12 @@ glm:
   timeout_s: 60
   max_tokens: 1500
 
+style:
+  # 默认风格画像（reference_profile.json 的路径，相对项目根；留空用内置基线）
+  # 生成：python cli.py analyze-reference reference/samples/*.mp4 --channel 名字
+  profile: ""
+
+
 qc:
   max_black_seconds: 2.0
   max_volume_db: -0.5

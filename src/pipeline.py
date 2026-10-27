@@ -8,6 +8,7 @@ materials/render/qc 置为 stale，重跑自动只补受影响的部分）。
 而不是整条视频从头再来。
 """
 import random
+from pathlib import Path
 
 from src import director, material_manager, music_analyzer, qc, renderer
 from src import review as review_mod
@@ -15,6 +16,20 @@ from src import timeline as tl_mod
 from src.jsonio import load_json, save_json
 from src.store import (StoreError, load_manifest, mark_stage, project_dir,
                        set_status, stage_done)
+
+
+def resolve_style(brief: dict, cfg: dict) -> dict | None:
+    """风格画像：brief.style_profile 优先，退回 config style.profile。"""
+    path = brief.get("style_profile") or cfg.get("style", {}).get("profile")
+    if not path:
+        return None
+    p = Path(path)
+    if not p.is_absolute():
+        p = Path(__file__).resolve().parent.parent / path
+    prof = load_json(p)
+    if not prof or "derived" not in prof:
+        raise StoreError(f"风格画像缺失或无 derived 段: {path}")
+    return prof["derived"]
 
 
 def cover_time(tline: dict, music_map: dict) -> float:
@@ -39,6 +54,11 @@ def make(pid: str, cfg: dict, keys: dict, offline: bool = False,
     target_s = float(brief.get("duration_s") or cfg["video"]["target_duration_s"])
     if not brief.get("music"):
         raise StoreError("brief 缺少 music 字段")
+    style = resolve_style(brief, cfg)
+    video_cfg = dict(cfg["video"])
+    if style and style.get("video"):
+        video_cfg.update({k: v for k, v in style["video"].items()
+                          if k in video_cfg})
 
     # 1 音乐理解
     if redo or not stage_done(manifest, "music_map"):
@@ -57,18 +77,21 @@ def make(pid: str, cfg: dict, keys: dict, offline: bool = False,
 
     # 2 导演计划
     if redo or not stage_done(manifest, "storyboard"):
-        sb = director.plan_storyboard(brief, music_map, cfg, keys.get("zhipu", ""))
+        sb = director.plan_storyboard(brief, music_map, cfg, keys.get("zhipu", ""),
+                                      style=style)
         save_json(pdir / "storyboard.json", sb)
         mark_stage(pid, manifest, "storyboard",
                    info={"mode": sb["generator"]["mode"],
-                         "shots": sum(len(s["shots"]) for s in sb["sections"])})
+                         "shots": sum(len(s["shots"]) for s in sb["sections"]),
+                         "style": bool(style)})
     storyboard = load_json(pdir / "storyboard.json")
 
     # 3 时间轴
     if redo or not stage_done(manifest, "timeline"):
         rng = random.Random(str(brief.get("seed") or pid))
         tline = tl_mod.plan_from_storyboard(storyboard, music_map,
-                                            cfg["timeline"], cfg["video"], rng=rng)
+                                            cfg["timeline"], video_cfg, rng=rng,
+                                            style=style)
         tline["audio"].update({
             "fade_in_s": float(cfg["music"]["fade_in_s"]),
             "fade_out_s": float(cfg["music"]["fade_out_s"]),
@@ -90,7 +113,7 @@ def make(pid: str, cfg: dict, keys: dict, offline: bool = False,
 
     # 5 渲染（片段缓存生效：只有缺失/revision 变化的镜头真正重渲）
     if redo or not stage_done(manifest, "render"):
-        clips = [renderer.render_clip(s, cfg["video"], pdir / "clips")
+        clips = [renderer.render_clip(s, video_cfg, pdir / "clips")
                  for s in tline["shots"]]
         final = pdir / "output" / "final.mp4"
         renderer.compose(clips, tline, final)
