@@ -30,7 +30,7 @@ pip install -r requirements.txt
 cp .env.example .env        # 填 PEXELS_API_KEY（必需）/ ZHIPU_API_KEY（可选）
 python cli.py doctor        # 体检，不耗额度
 
-# 放一首授权音乐进 music/（或直接用 ../bili-autopost-sau/bgm 的 CC 曲库）
+# 放一首授权音乐进 music/（曲库格式与授权红线见 music/README.md）
 python cli.py create --theme 治愈系山海 --music music/xxx.mp3 --duration 60
 python cli.py make project-001          # 制作，断点续跑
 python cli.py show project-001          # 状态 + 时间轴 + 质检概览
@@ -52,14 +52,14 @@ music_map → storyboard → timeline → materials → render → qc → review
 
 QC 是确定性闸门：规格/时长 ±1.5s/静音/削波/黑帧/封面/时间轴不变量/
 切点吸附率；审美起伏由人工审片裁决，`approve` 前不生成上传物料。
+本项目自包含：无任何对外部相邻仓库的运行时依赖，可独立克隆运行。
 
-## 与仓库其他项目的关系
+## 设计要点
 
-- `see-china/src/music_edit.py`：五段情绪模板与 xfade 回补公式的来源，
-  其预留的 P1 节拍接口由本项目的音乐引擎实现；
-- `bili-history`：QC 清单、numpy 音频分析范式；
-- `bili-autopost-sau`：Pexels 检索/许可记录模式、CC 曲库（config 默认
-  引用其 manifest 自动补音乐署名）。
+- 五段情绪模型（opening/build/climax/settle/ending）的镜头时长区间与
+  xfade 重叠回补公式是本项目自身调参的结果，全部在 `src/timeline.py`；
+- 音乐分析为纯 numpy STFT 实现，不依赖 librosa/numba，后端可整体替换；
+- 制作与发布分离：产线只交付成片与上传物料，投稿动作永远由人执行。
 
 ## 测试
 

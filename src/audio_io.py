@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """音频解码：任意 ffmpeg 认识的格式 → 单声道 float32。
 
-沿用 bili-history/lyricvideo/music_key.py 的做法：优先用 PATH 里的
-ffmpeg，退回 imageio-ffmpeg 自带的二进制，不引入额外解码依赖。
+优先用 PATH 里的 ffmpeg，退回 imageio-ffmpeg 随 pip 安装的二进制，
+不引入额外解码依赖。
 """
 import shutil
 import subprocess

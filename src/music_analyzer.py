@@ -5,8 +5,8 @@
   tempo/节拍网格、能量曲线、起振强度、段落边界（intro→climax→outro）、
   切镜候选点（段落边界 + 强起振 + 小节线），以及播放窗口选择。
 
-实现为纯 numpy STFT（沿用 bili-history/lyricvideo/music_key.py 的范式），
-不引入 librosa/numba；analyze() 是唯一入口，后端可整体替换。
+实现为纯 numpy STFT，不引入 librosa/numba（轻依赖、跨版本稳定）；
+analyze() 是唯一入口，后端可整体替换。
 
 时间单位约定：能量/起振曲线的帧率 ENV_FPS ≈ 43 帧/秒；落盘曲线降采样到
 CURVE_FPS = 20；所有落盘时间为秒（保留 3 位小数）。
@@ -283,11 +283,11 @@ def analyze(path: str, target_s: float | None = None,
     }
 
 
-def window_sections(music_map: dict, min_len_s: float = 1.0) -> list[dict]:
+def window_sections(music_map: dict, min_len_s: float = 2.0) -> list[dict]:
     """取播放窗口内的段落，时间换算到视频时间轴（窗口起点为 0）。
 
-    过碎的边缘片段（如窗口切在段落中间留下的 <1s 碎片）并入更大的
-    邻居——段落必须无缝铺满窗口，否则时间轴总时长会短于 target_s。
+    过碎的段落（窗口切割边缘、检测噪声）并入更大的邻居——存活段落
+    必须能装下至少一个最短镜头（默认 2s），否则下游时间轴必然不可行。
     """
     w0 = music_map["play_window"]["start"]
     w1 = music_map["play_window"]["end"]

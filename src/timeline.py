@@ -14,7 +14,8 @@ import random
 
 from src.music_analyzer import window_sections
 
-# 各角色单镜头时长参考区间（继承 see-china music_edit 的经验值）
+# 各角色单镜头时长参考区间（本产线对治愈系 60s 风景片的调参基线：
+# 开场舒展、高潮紧凑 2.4-4.2s、回落给足欣赏空间）
 ROLE_SHOT_LEN = {
     "opening": (3.5, 6.0),
     "build": (3.0, 5.0),

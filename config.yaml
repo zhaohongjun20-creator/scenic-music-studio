@@ -14,9 +14,9 @@ music:
   fade_in_s: 1.5
   fade_out_s: 3.0
   loudnorm: true                 # 单遍响度归一 I=-16 LUFS
-  # 可选：本地曲库 manifest（用于 create 时自动查署名信息）
-  catalogs:
-    - "../bili-autopost-sau/bgm/manifest.json"
+  # 本项目自己的曲库清单（可选）：music/music_catalog.json，格式见 music/README.md
+  # 命中清单时 create 自动带上音乐署名；不配置则只校验文件存在
+  catalogs: []
 
 timeline:
   min_shot_s: 2.0                # 任何镜头下限：不为凑节奏产出闪切
@@ -32,7 +32,7 @@ material:
   avoid_reuse_shots: 2           # 相邻 N 个镜头内不重复用同一素材
 
 glm:
-  model: "glm-4-flash"          # 前身项目已验证的稳定款
+  model: "glm-4-flash"          # 轻量稳定档；可换更强的 glm-4 系列提高创意质量
   temperature: 0.8
   timeout_s: 60
   max_tokens: 1500

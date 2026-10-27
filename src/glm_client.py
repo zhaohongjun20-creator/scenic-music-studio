@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""GLM API 封装：chat + 容错 JSON 解析（沿用 bili-autopost-sau copywriter 范式）。
+"""GLM API 封装：chat + 容错 JSON 解析（裸 JSON/markdown 围栏/前后杂质）。
 
 无 key、网络失败或响应不合法一律返回 None，调用方走降级路径——
 "产线可以断，烂片不能发"的反面：创意层可以缺，流程不能停。

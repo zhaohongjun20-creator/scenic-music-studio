@@ -10,8 +10,8 @@ from src.store import MUSIC_DIR, ROOT
 def doctor(cfg: dict) -> list[tuple[str, str, str]]:
     """返回 (名称, 级别 ok/soft/hard, 说明) 列表。"""
     rows: list[tuple[str, str, str]] = []
-    rows.append(("python", "ok" if sys.version_info >= (3, 10) else "hard",
-                 sys.version.split()[0]))
+    rows.append(("python", "ok" if sys.version_info >= (3, 12) else "hard",
+                 sys.version.split()[0] + "（要求 3.12+）"))
     try:
         rows.append(("ffmpeg", "ok", ffmpeg_exe()))
     except Exception as e:                                   # pragma: no cover

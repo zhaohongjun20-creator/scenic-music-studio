@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""pytest 公共设施：包路径 + 合成测试音频（120 BPM 节拍脉冲、五段能量）。"""
+"""pytest 公共设施：包路径 + 合成测试音频（可调 BPM/能量包络的节拍脉冲）。"""
 import sys
 import wave
 from pathlib import Path
@@ -13,11 +13,15 @@ if str(ROOT) not in sys.path:
 
 SR = 22050
 
+# 默认能量包络：弱起(0-8s) → 铺陈(8-20) → 强段(20-32) → 回落(32-40) → 收尾(40-48)
+DEFAULT_ENV = [(0.0, 0.15), (7.9, 0.15), (8.0, 0.5), (19.9, 0.5), (20.0, 1.0),
+               (31.9, 1.0), (32.0, 0.5), (39.9, 0.5), (40.0, 0.12), (48.0, 0.12)]
 
-def make_click_track(path: Path, duration: float = 48.0, bpm: float = 120.0) -> Path:
-    """五段能量包络的节拍脉冲曲：
-    0-8s 弱(0.15) / 8-20 中(0.5) / 20-32 强(1.0) / 32-40 中(0.5) / 40-48 弱(0.12)。
-    """
+
+def make_click_track(path: Path, duration: float = 48.0, bpm: float = 120.0,
+                     env: list | None = None) -> Path:
+    """节拍脉冲合成曲：能量包络（时间断点列表）决定段落结构。"""
+    env = env or DEFAULT_ENV
     rng = np.random.default_rng(7)                 # 固定种子保证可复现
     n = int(duration * SR)
     sig = np.zeros(n, dtype=np.float32)
@@ -35,9 +39,7 @@ def make_click_track(path: Path, duration: float = 48.0, bpm: float = 120.0) -> 
         sig[start:end] += click[:end - start]
         k += 1
     t = np.arange(n) / SR
-    amp = np.interp(
-        t, [0, 7.9, 8.0, 19.9, 20.0, 31.9, 32.0, 39.9, 40.0, duration],
-        [0.15, 0.15, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 0.12, 0.12])
+    amp = np.interp(t, [p[0] for p in env], [p[1] for p in env])
     sig *= amp.astype(np.float32)
     sig *= np.float32(0.7)                         # 留削波余量，避免误触 QC
     pcm = (np.clip(sig, -1.0, 1.0) * 32767).astype("<i2")

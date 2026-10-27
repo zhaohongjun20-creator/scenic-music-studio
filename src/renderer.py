@@ -3,8 +3,8 @@
 
 - 每个镜头独立渲染成 1920x1080@30 无音轨片段，缓存键 = 素材 id +
   取材区间 + 调色参数 + revision——redo-shot 换素材只重渲染该镜头；
-- 合成沿 see-china/bili-autopost-sau 验证过的 xfade 链配方：
-  成片时长 = Σrender_length − Σ转场时长 = target_s（时间轴已守恒）；
+- 合成的 xfade 链配方：成片时长 = Σrender_length − Σ转场时长 =
+  target_s（时间轴已守恒），分步串接避免超长 filtergraph；
 - 音乐按播放窗口偏移取材，响度归一 + 首尾淡入淡出，与画面同步收尾。
 """
 import hashlib

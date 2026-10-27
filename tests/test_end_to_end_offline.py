@@ -18,9 +18,9 @@ def iso(tmp_path, monkeypatch):
     return tmp_path
 
 
-def _make(iso, synth_music) -> tuple[str, dict]:
+def _make(iso, synth_music, duration_s: float = 20.0) -> tuple[str, dict]:
     mf = store.new_project({"theme_zh": "治愈系山海", "mood": "治愈",
-                            "duration_s": 20.0, "music": str(synth_music),
+                            "duration_s": duration_s, "music": str(synth_music),
                             "platform": "test"})
     return mf["id"], pipeline.make(mf["id"], load_config(), keys={},
                                    offline=True)
@@ -53,3 +53,29 @@ def test_offline_redo_shot_reuses_cache(iso, synth_music):
     tline = load_json(store.project_dir(pid) / "timeline.json")
     assert tline["shots"][0]["revision"] == 1
     assert all(s["revision"] == 0 for s in tline["shots"][1:])
+
+
+def test_offline_partial_redo_only_touches_target_shot(iso, synth_music):
+    """审查清单·缓存测试：只重做镜头 5，其余镜头的渲染片段必须原封不动。"""
+    pid, _ = _make(iso, synth_music, duration_s=30.0)
+    clips_dir = store.project_dir(pid) / "clips"
+
+    def snapshot() -> dict:
+        return {p.name: p.stat().st_mtime_ns for p in clips_dir.glob("*.mp4")}
+
+    before = snapshot()
+    assert len(before) >= 6, "测试需要至少 6 个镜头才有区分度"
+
+    review.redo_shot(pid, 5, note="只重做这个")
+    summary = pipeline.make(pid, load_config(), keys={}, offline=True)
+    assert summary["qc_passed"], summary["problems"]
+
+    after = snapshot()
+    old_s5 = {n for n in before if n.startswith("s05_")}
+    new_s5 = {n for n in after if n.startswith("s05_")}
+    assert new_s5 and not (new_s5 & old_s5), "镜头 5 应产出新缓存键的片段"
+
+    others_before = {n: t for n, t in before.items() if not n.startswith("s05_")}
+    others_after = {n: t for n, t in after.items() if not n.startswith("s05_")}
+    assert others_before == others_after, \
+        "未受影响的镜头片段被重复渲染（缓存失效范围过大）"
