@@ -154,7 +154,13 @@ def cmd_redo_shot(args) -> None:
 
 
 def cmd_approve(args) -> None:
-    review_mod.approve(args.project, note=args.note or "")
+    checklist = load_json(args.checklist)
+    if not isinstance(checklist, dict):
+        _die("审片清单必须是合法 JSON 对象（先运行 review-template）")
+    review_mod.approve(args.project, note=args.note or "",
+                       reviewer=args.reviewer, checklist=checklist,
+                       watched_full=args.watched_full,
+                       final_sha256=args.final_sha256)
     print(f"{args.project} 已放行（ready）。"
           f"生成上传物料：python cli.py publish-prepare {args.project}")
 
@@ -204,6 +210,36 @@ def cmd_ab_package(args) -> None:
     print(f"  ├─ 盲评表.md（四维 1-5 分 + 总评）")
     print(f"  └─ 对应关系已封存（评完再对答案）: {result['key']}")
     print("请先盲评打分，之后可自行打开 key 文件或让我公布对照结果。")
+
+
+def cmd_review_template(args) -> None:
+    from src.jsonio import save_json
+    out = Path(args.out)
+    if out.exists():
+        _die("审片表已存在，不覆盖人工记录；请使用新的 --out")
+    save_json(out, {name: False for name in review_mod.CHECKLIST_ITEMS})
+    current = review_mod.load_review(args.project)
+    print(f"待人工填写：{out}")
+    print("完整观看后将六项逐一改为 true；不通过应 reject / redo-shot。")
+    print("当前成片绑定（审批时复制 final_sha256）：")
+    print(json.dumps(current.get("binding", {}), ensure_ascii=False, indent=2))
+
+
+def cmd_export_evidence(args) -> None:
+    from src import evidence
+    result = evidence.export_project(args.project, args.out,
+                                     include_media=args.include_media)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    if not result["integrity_passed"]:
+        sys.exit(1)
+
+
+def cmd_verify_evidence(args) -> None:
+    from src import evidence
+    result = evidence.verify_bundle(args.path)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    if not result["integrity_passed"] or (args.require_media and not result["self_contained"]):
+        sys.exit(1)
 
 
 def cmd_prune_cache(args) -> None:
@@ -261,10 +297,30 @@ def main() -> None:
     p.add_argument("--note", help="重做原因，如：高潮再壮阔一点")
     p.set_defaults(func=cmd_redo_shot)
 
-    p = sub.add_parser("approve", help="人工放行")
+    p = sub.add_parser("review-template", help="生成待人工填写的六项审片表")
     p.add_argument("project")
+    p.add_argument("--out", required=True)
+    p.set_defaults(func=cmd_review_template)
+
+    p = sub.add_parser("approve", help="人工放行（绑定当前成片与完整观看声明）")
+    p.add_argument("project")
+    p.add_argument("--reviewer", required=True, help="实际审看片的人")
+    p.add_argument("--checklist", required=True, help="六项审片 JSON（全部严格 true）")
+    p.add_argument("--watched-full", action="store_true", help="声明实际完整观看成片")
+    p.add_argument("--final-sha256", required=True, help="实际观看成片的 SHA256")
     p.add_argument("--note")
     p.set_defaults(func=cmd_approve)
+
+    p = sub.add_parser("export-evidence", help="导出相对路径与 SHA256 验收快照")
+    p.add_argument("project")
+    p.add_argument("--out", required=True, help="新的证据目录（不覆盖）")
+    p.add_argument("--include-media", action="store_true", help="复制音乐/素材/成片；须确认再分发许可")
+    p.set_defaults(func=cmd_export_evidence)
+
+    p = sub.add_parser("verify-evidence", help="离线核对证据包哈希与路径")
+    p.add_argument("path")
+    p.add_argument("--require-media", action="store_true", help="缺任意媒体或成片也判失败")
+    p.set_defaults(func=cmd_verify_evidence)
 
     p = sub.add_parser("reject", help="打回")
     p.add_argument("project")

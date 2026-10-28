@@ -1,0 +1,37 @@
+{
+  "id": "project-001",
+  "created_at": "2026-10-27T20:30:47",
+  "status": "review",
+  "stages": {
+    "music_map": {
+      "status": "done",
+      "at": "2026-10-27T20:30:57",
+      "tempo_bpm": 119.5,
+      "sections": 3
+    },
+    "storyboard": {
+      "status": "done",
+      "at": "2026-10-27T20:35:14",
+      "mode": "glm",
+      "shots": 16
+    },
+    "timeline": {
+      "status": "done",
+      "at": "2026-10-27T20:35:14",
+      "shots": 16
+    },
+    "materials": {
+      "status": "done",
+      "at": "2026-10-27T20:58:29"
+    },
+    "render": {
+      "status": "done",
+      "at": "2026-10-27T20:59:18"
+    },
+    "qc": {
+      "status": "done",
+      "at": "2026-10-27T20:59:20",
+      "problems": []
+    }
+  }
+}

@@ -16,3 +16,7 @@ __pycache__/
 reference/samples/
 reference/*.mp4
 ab_experiment/
+delivery/
+.dsh-progress/
+docs/acceptance/2026-10-28-portable/media/
+migrate_historical_evidence.py

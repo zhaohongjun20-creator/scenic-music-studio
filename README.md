@@ -38,9 +38,19 @@ python cli.py show project-001          # 状态 + 时间轴 + 质检概览
 python cli.py redo-shot project-001 5 --note "高潮再壮阔一点"   # 局部重做
 python cli.py make project-001          # 只有该镜头真正重做，其余走缓存
 
-python cli.py approve project-001       # 人工看片后放行
+python cli.py review-template project-001 --out my_review.json   # 六项待填表
+python cli.py approve project-001 \
+    --reviewer 你的名字 --checklist my_review.json \
+    --watched-full --final-sha256 <看过的成片 SHA256>            # 人工放行
 python cli.py publish-prepare project-001   # 生成 upload_info.txt（不投稿）
 ```
+
+放行绑定的是**具体那一版成片**：approve 记录 reviewer、六项清单
+（opening/climax/cuts/transitions/color/ending 必须逐项为 true）、
+完整观看声明，以及 final.mp4 / timeline.json / qc_report.json 三个 SHA256。
+之后任何重渲、redo-shot、改 timeline 都会自动撤销旧审批，
+`publish-prepare` 落盘前还会再复核一次。这是本地自声明，不是身份认证；
+程序不会替人看片，也不预填清单。
 
 没有 API key 也能跑通全链：`make --offline`（占位素材 + 规则导演）。
 
@@ -58,6 +68,31 @@ python cli.py prune-cache --max-files 60  # 素材缓存护栏（只保留最新
 每次 make 落盘 `projects/<id>/provenance.json`：音乐/brief/风格画像的
 sha1、配置指纹、导演模式、素材清单（含许可）、成片与封面哈希——
 多轮修改后仍可回答"最终成片到底用了什么"。
+
+## 验收证据可搬运、可离线核验
+
+```bash
+python cli.py export-evidence project-001 --out docs/acceptance/xxx
+                                        # 复制 JSON 契约并把路径改写为证据内相对路径，
+                                        # 每个文件记 SHA256；--include-media 才复制
+                                        # 音乐/素材/成片（先确认再分发许可）
+python cli.py verify-evidence docs/acceptance/xxx
+                                        # 离线重算哈希：缺文件、被改动、路径越界都报错
+python cli.py verify-evidence docs/acceptance/xxx --require-media
+```
+
+证据包不含绝对路径，换机器/换目录也能核验。元数据版可以过完整性
+校验，但会被明确标注 `self_contained: false`（成片与素材不在包内）；
+不会因为"哈希对得上"就宣称审美验收通过。
+
+## 缓存不是"阶段 done"
+
+`manifest.freshness` 记录每个阶段**实际吃进去的输入**与产出的 SHA256：
+音乐文件内容、brief、风格画像、配置、离线开关、素材字节都会参与指纹。
+所以"改音乐/brief/配置但不删 projects/"不会再被旧步骤骗过去；
+产物缺失或片段被替换也会重建。反过来，只重跑 QC 不会覆盖上一轮渲染
+写下的 provenance，失败或制作期间输入变化也不会给旧成片洗出新来源。
+redo-shot 仍然只动目标镜头，其余片段的文件名与 mtime 不变。
 
 ## 阶段流水线（manifest.json 记账，断点续跑）
 

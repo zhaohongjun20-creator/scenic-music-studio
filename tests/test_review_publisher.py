@@ -23,9 +23,19 @@ def pid(tmp_path, monkeypatch):
                    "page_url": f"https://www.pexels.com/video/{i + 1}/",
                    "url": f"https://v/{i + 1}", "author": chr(65 + i)}}
         for i in range(2)]
-    save_json(store.project_dir(mf["id"]) / "timeline.json",
-              {"target_s": 10.0, "audio": {}, "shots": shots})
+    pdir = store.project_dir(mf["id"])
+    save_json(pdir / "timeline.json", {"target_s": 10.0, "audio": {}, "shots": shots})
+    # 只测试绑定机制，不冒充真实可播放媒体或用户审片。
+    (pdir / "output" / "final.mp4").write_bytes(b"fixture-only-render-v1")
+    save_json(pdir / "output" / "qc_report.json", {"passed": True, "problems": []})
     return mf["id"]
+
+
+def approve_fixture(pid, note=""):
+    return review.approve(
+        pid, note, reviewer="fixture-reviewer", watched_full=True,
+        checklist={key: True for key in review.CHECKLIST_ITEMS},
+        final_sha256=review.load_review(pid)["binding"]["final_sha256"])
 
 
 def test_publish_requires_ready(pid):
@@ -37,7 +47,7 @@ def test_publish_requires_ready(pid):
 
 def test_approve_then_prepare(pid):
     review.mark_rendered(pid, True, [])
-    review.approve(pid, "可以")
+    approve_fixture(pid, "可以")
     assert review.load_review(pid)["status"] == "ready"
     out = publisher.prepare(pid, CFG, api_key="")
     text = out.read_text(encoding="utf-8")
@@ -48,7 +58,7 @@ def test_approve_then_prepare(pid):
 
 def test_fallback_copy_when_no_glm(pid):
     review.mark_rendered(pid, True, [])
-    review.approve(pid)
+    approve_fixture(pid)
     out = publisher.prepare(pid, CFG, api_key="")
     assert "把测试山海的风" in out.read_text(encoding="utf-8")
 
@@ -60,8 +70,12 @@ def test_reject_requires_note(pid):
 
 def test_redo_shot_invalidates_downstream(pid):
     review.mark_rendered(pid, True, [])
-    review.approve(pid)
+    approve_fixture(pid)
+    out = publisher.prepare(pid, CFG, api_key="")
     review.redo_shot(pid, 0, note="换一个更壮阔的")
+    assert not out.exists()
+    assert "approval" not in review.load_review(pid)
+    assert store.load_manifest(pid)["status"] == "draft"
     tline = load_json(store.project_dir(pid) / "timeline.json")
     assert tline["shots"][0]["revision"] == 1
     assert "pexels-1" in tline["shots"][0]["exclude_assets"]

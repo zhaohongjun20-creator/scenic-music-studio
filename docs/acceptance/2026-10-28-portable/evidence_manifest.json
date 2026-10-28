@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "project": "project-001",
+  "path_base": "evidence-directory",
+  "files": {
+    "brief.json": {
+      "sha256": "87a68a514fbbd9f25d180fda9a38eb07b924896f1156dda6e31cfe3bebda8669",
+      "bytes": 395,
+      "source_sha256": "e6e884f8e1cf8faad65e58ae89811b5845952131b867f707d2286441f8da1ed5"
+    },
+    "music_map.json": {
+      "sha256": "419e64f67a755c489ed1f643afca3dbc5ff879365e5ae4420d13bc19f0d80ad3",
+      "bytes": 61648,
+      "source_sha256": "523e98448547f349b452e303668158e3a8b29e02cc98dd0395de79c2b77864d2"
+    },
+    "storyboard.json": {
+      "sha256": "3147376b9047c602de589c13b1f2bc2f27cb26ac291f9a6ddb3167a556ff3067",
+      "bytes": 4159,
+      "source_sha256": "216b06d2c7fc22d40223f934568124b6283243d06b7adc205e814ebfb9e7231b"
+    },
+    "timeline.json": {
+      "sha256": "791702f473a3db85a57994319b2eeb8cf8b74bb10e18f4f05bfe5c0061593838",
+      "bytes": 19069,
+      "source_sha256": "8f7b5b01070bd0ebce8c0cc02aa3f5a8c3f8b70885d5010a9422a8681d949a22"
+    },
+    "manifest.json": {
+      "sha256": "a06d7f504558a51dffe84ab5dfad8bcf1eae29adad601098a532f1baab700120",
+      "bytes": 762,
+      "source_sha256": "a06d7f504558a51dffe84ab5dfad8bcf1eae29adad601098a532f1baab700120"
+    },
+    "review.json": {
+      "sha256": "d152752252a2a27cab7ef3fd2a9401ec675942b53585fc7e5f1099e5df375f7b",
+      "bytes": 535,
+      "source_sha256": "d152752252a2a27cab7ef3fd2a9401ec675942b53585fc7e5f1099e5df375f7b"
+    },
+    "qc_report.json": {
+      "sha256": "e81b1408406c6eead7c4d3a89b75faf8aedde08c1031cabb1a9bc630753ed810",
+      "bytes": 226,
+      "source_sha256": "e81b1408406c6eead7c4d3a89b75faf8aedde08c1031cabb1a9bc630753ed810"
+    },
+    "cover.jpg": {
+      "sha256": "b515578e6f9119500434d202bee6483c6c881109ae6ea8dee73eca1cdfbd4c01",
+      "bytes": 594438,
+      "source_sha256": "b515578e6f9119500434d202bee6483c6c881109ae6ea8dee73eca1cdfbd4c01"
+    }
+  },
+  "references": [
+    {
+      "path": "media/music/8c6406342ddc8446a7f773ab.mp3",
+      "kind": "music",
+      "included": false,
+      "source_available": true,
+      "fingerprint": {
+        "sha256": "8c6406342ddc8446a7f773ab55d9ffae6b4cd88dcec13f948c6358e1a12679ba",
+        "bytes": 2692800
+      }
+    },
+    {
+      "path": "media/assets/4905b176323ec1b3cd34776a.mp4",
+      "kind": "assets",
+      "included": false,
+      "source_available": true,
+      "fingerprint": {
+        "sha256": "4905b176323ec1b3cd34776a58fb85521223dd4305c7cb4ab7ed431fff976935",
+        "bytes": 4279579
+      }
+    },
+    {
+      "path": "media/assets/b10be5cf33fc3a1070683b5e.mp4",
+      "kind": "assets",
+      "included": false,
+      "source_available": true,
+      "fingerprint": {
+        "sha256": "b10be5cf33fc3a1070683b5e1b64d4323d3c2b0f929a94a579dfff4699825604",
+        "bytes": 18463055
+      }
+    },
+    {
+      "path": "media/assets/2db105196c04b186981ee03f.mp4",
+      "kind": "assets",
+      "included": false,
+      "source_available": true,
+      "fingerprint": {
+        "sha256": "2db105196c04b186981ee03fd20dcf78b1ae7109d92dd27a704dde78fb142436",
+        "bytes": 51203486
+      }
+    },
+    {
+      "path": "media/assets/1bf9a9fa788acbba6f226928.mp4",
+      "kind": "assets",
+      "included": false,
+      "source_available": true,
+      "fingerprint": {
+        "sha256": "1bf9a9fa788acbba6f22692819a36939a06c27aa611cfb7287d57b4efdf719a7",
+        "bytes": 5014533
+      }
+    },
+    {
+      "path": "media/assets/3d7e2db8cc799467c1aee37c.mp4",
+      "kind": "assets",
+      "included": false,
+      "source_available": true,
+      "fingerprint": {
+        "sha256": "3d7e2db8cc799467c1aee37c4927003aebb4a2adb559c2def36845155abfe70b",
+        "bytes": 88963928
+      }
+    },
+    {
+      "path": "media/assets/1866b427ab8a5b22302956fc.mp4",
+      "kind": "assets",
+      "included": false,
+      "source_available": true,
+      "fingerprint": {
+        "sha256": "1866b427ab8a5b22302956fcdcb9dd4b2d55a5a327cfe902146022d7d0f3243d",
+        "bytes": 2217322
+      }
+    },
+    {
+      "path": "media/assets/2e2d5a6396519b8e7258203a.mp4",
+      "kind": "assets",
+      "included": false,
+      "source_available": true,
+      "fingerprint": {
+        "sha256": "2e2d5a6396519b8e7258203a477231aafe84b211f2cb42c302c2e38691ad970b",
+        "bytes": 5835348
+      }
+    },
+    {
+      "path": "media/outputs/3dbeb7b209e851d4c5cc4d9d.mp4",
+      "kind": "outputs",
+      "included": false,
+      "source_available": true,
+      "fingerprint": {
+        "sha256": "3dbeb7b209e851d4c5cc4d9d9bca4576cc6e45ffaa4f028cb6e9174c7e6380a9",
+        "bytes": 142714002
+      }
+    }
+  ],
+  "warnings": [],
+  "acceptance": {
+    "technical_qc": "reported_pass",
+    "human_review": "not_verified_by_export",
+    "reference_style": "not_verified_by_export",
+    "final_included": false
+  },
+  "note": "哈希证明文件一致性，不证明来源可信、授权或审美合格。QC 是源记录，不是本次重新渲染/重新质检。"
+}

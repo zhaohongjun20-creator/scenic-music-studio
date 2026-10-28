@@ -1,0 +1,27 @@
+{
+  "status": "ready",
+  "comments": [],
+  "history": [
+    {
+      "at": "2026-10-27T20:54:10",
+      "action": "rendered",
+      "qc_passed": true
+    },
+    {
+      "at": "2026-10-27T20:57:44",
+      "action": "redo-shot",
+      "shot": 14,
+      "note": "同素材已用两次，换一个"
+    },
+    {
+      "at": "2026-10-27T20:59:20",
+      "action": "rendered",
+      "qc_passed": true
+    },
+    {
+      "at": "2026-10-27T20:59:33",
+      "action": "approve",
+      "note": "验收通过"
+    }
+  ]
+}

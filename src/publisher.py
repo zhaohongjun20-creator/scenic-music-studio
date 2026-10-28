@@ -12,8 +12,8 @@ from pathlib import Path
 
 from src.glm_client import chat_json
 from src.jsonio import load_json
-from src.review import load_review
-from src.store import project_dir
+from src.review import validate_approval
+from src.store import StoreError, project_dir
 
 
 class PublishError(RuntimeError):
@@ -85,11 +85,15 @@ def _credits_block(timeline: dict, brief: dict) -> str:
 
 
 def prepare(pid: str, cfg: dict, api_key: str) -> Path:
-    review = load_review(pid)
-    if review["status"] != "ready":
-        raise PublishError(
-            f"成片未过审（status={review['status']}），先人工 approve 再发布物料")
     pdir = project_dir(pid)
+    out = pdir / "output" / "upload_info.txt"
+    # 失败时不留下上一轮可被误当成有效的发布物料。
+    out.unlink(missing_ok=True)
+    try:
+        review = validate_approval(pid)
+    except StoreError as exc:
+        raise PublishError(str(exc)) from exc
+    approval = review["approval"]
     timeline = load_json(pdir / "timeline.json")
     brief = load_json(pdir / "brief.json") or {}
     if not timeline:
@@ -109,7 +113,13 @@ def prepare(pid: str, cfg: dict, api_key: str) -> Path:
             required_keys=("title", "desc", "tags"))
     copy = _clean_copy(copy or _fallback_copy(brief))
 
-    out = pdir / "output" / "upload_info.txt"
+    # 文案 API 可能耗时；落盘前再次检查，避免期间重新渲染/撤回审批。
+    try:
+        current = validate_approval(pid)
+    except StoreError as exc:
+        raise PublishError(str(exc)) from exc
+    if current["approval"] != approval:
+        raise PublishError("生成文案期间人工审批记录发生变化，请重新准备发布物料")
     out.write_text(
         "\n".join([
             f"【标题】{copy['title']}",
@@ -119,6 +129,15 @@ def prepare(pid: str, cfg: dict, api_key: str) -> Path:
             "",
             f"【标签】{' '.join(copy['tags'])}",
             f"【建议分区】影视区-混剪/风景（按频道实际分区调整）",
+            "",
+            "【人工审片凭据（本地自声明）】",
+            f"reviewer: {approval['reviewer']}",
+            f"reviewed_at: {approval['at']}",
+            f"render_id: {approval['render_id']}",
+            f"final SHA256: {approval['binding']['final_sha256']}",
+            f"timeline SHA256: {approval['binding']['timeline_sha256']}",
+            f"QC SHA256: {approval['binding']['qc_sha256']}",
+            approval['declaration'],
             "",
             f"【上传文件】",
             f"- {pdir / 'output' / 'final.mp4'}",

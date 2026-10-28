@@ -62,6 +62,16 @@ def test_boundary_detection_on_known_cuts(hardcut_video):
     assert all(b["kind"] == "hard" for b in boundaries)   # 纯色硬切应为 hard
 
 
+def test_density_counts_cuts_in_time_thirds():
+    # Uneven editing: all but one cut occurs in the first 10 seconds.
+    cuts = [{"t": t} for t in (1, 2, 3, 4, 21)]
+    assert style_analyzer.density_by_third(cuts, 30) == [24.0, 0.0, 6.0]
+    assert style_analyzer.density_by_third([], 30) == [0.0, 0.0, 0.0]
+    assert style_analyzer.density_by_third([{ "t": 10}, {"t": 20}], 30) == [0.0, 6.0, 6.0]
+    with pytest.raises(ValueError):
+        style_analyzer.density_by_third([], 0)
+
+
 def test_profile_derive_shape():
     fake_stats = [{
         "len_median": 2.6, "len_p25": 1.4, "len_p75": 4.35,

@@ -141,13 +141,24 @@ def _motion_stats(frames: np.ndarray, boundaries: list[dict], fps: float) -> dic
             "frame_diff_p75": round(float(q75), 4)}
 
 
+def density_by_third(boundaries: list[dict], duration: float) -> list[float]:
+    """Count actual cuts in equal *time* thirds, not equal groups of shots."""
+    if duration <= 0:
+        raise ValueError("样片时长必须大于零")
+    counts = [0, 0, 0]
+    for boundary in boundaries:
+        t = float(boundary["t"])
+        if 0 < t < duration:
+            counts[min(2, int(t * 3 / duration))] += 1
+    return [round(n * 180.0 / duration, 2) for n in counts]
+
+
 def analyze_sample(path: str) -> dict:
     frames, fps = _decode_frames(path)
     duration = round(len(frames) / fps, 2)
     boundaries = detect_boundaries(frames, fps)
     lens = shot_lengths(boundaries, duration)
     arr = np.array(lens) if lens else np.array([duration])
-    thirds = np.array_split(arr.astype(float), 3)
     return {
         "file": str(path),
         "duration_s": duration,
@@ -158,8 +169,9 @@ def analyze_sample(path: str) -> dict:
         "len_p75": round(float(np.quantile(arr, 0.75)), 3),
         "len_min": round(float(arr.min()), 3),
         "len_max": round(float(arr.max()), 3),
-        "density_by_third_cpm": [round(float(len(t) / (duration / 180.0)), 2)
-                                 for t in thirds],      # 每三分段的切/分钟
+        "density_by_third_cpm": density_by_third(boundaries, duration),
+        "cuts_per_minute": round(len(boundaries) * 60.0 / duration, 2),
+        "metric_version": 2,  # v1 erroneously divided shots into equal-count groups
         "hard_cut_frac": round(
             sum(1 for b in boundaries if b["kind"] == "hard")
             / max(len(boundaries), 1), 3),
@@ -181,7 +193,6 @@ def derive(sample_stats: list[dict]) -> dict:
     sat = float(np.mean([s["color"]["saturation"] for s in sample_stats]))
     warmth = float(np.mean([s["color"]["warmth"] for s in sample_stats]))
     all_thirds = [v for s in sample_stats for v in s["density_by_third_cpm"]]
-    dense, calm = max(all_thirds), min(all_thirds)
     # 硬切为主：本产线转场以 cut 为主，仅段落边界允许柔和转场
     dense, calm = max(all_thirds), min(all_thirds)
     return {

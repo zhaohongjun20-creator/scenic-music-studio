@@ -1,0 +1,167 @@
+{
+  "brief": {
+    "theme_zh": "治愈系山海",
+    "mood": "治愈",
+    "duration_s": 60.0,
+    "platform": "bilibili",
+    "music": "media/music/8c6406342ddc8446a7f773ab.mp3",
+    "created_at": "2026-10-27T20:30:47",
+    "music_credit": {
+      "title": "Awake",
+      "artist": "johnfrantz17",
+      "license": "CC BY 3.0",
+      "source_url": "https://ccmixter.org/files/johnfrantz17/58272"
+    },
+    "seed": 7
+  },
+  "sections": [
+    {
+      "index": 0,
+      "role": "opening",
+      "music_start": 0.0,
+      "music_end": 4.776,
+      "energy": 0.5435,
+      "shot_count": 1,
+      "shots": [
+        {
+          "shot_id": "s01",
+          "scene": "mountain sunrise",
+          "motion_hint": "static",
+          "mood_zh": "宁静",
+          "duration_hint": 4.776
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "role": "build",
+      "music_start": 4.776,
+      "music_end": 36.68,
+      "energy": 0.618,
+      "shot_count": 8,
+      "shots": [
+        {
+          "shot_id": "s02",
+          "scene": "sea coast",
+          "motion_hint": "pan",
+          "mood_zh": "悠远",
+          "duration_hint": 3.988
+        },
+        {
+          "shot_id": "s03",
+          "scene": "ocean waves",
+          "motion_hint": "push",
+          "mood_zh": "轻柔",
+          "duration_hint": 3.988
+        },
+        {
+          "shot_id": "s04",
+          "scene": "mountain lake",
+          "motion_hint": "static",
+          "mood_zh": "恬静",
+          "duration_hint": 3.988
+        },
+        {
+          "shot_id": "s05",
+          "scene": "island",
+          "motion_hint": "static",
+          "mood_zh": "宁静",
+          "duration_hint": 3.988
+        },
+        {
+          "shot_id": "s06",
+          "scene": "mountain range",
+          "motion_hint": "aerial",
+          "mood_zh": "辽阔",
+          "duration_hint": 3.988
+        },
+        {
+          "shot_id": "s07",
+          "scene": "sea coast",
+          "motion_hint": "pan",
+          "mood_zh": "悠远",
+          "duration_hint": 3.988
+        },
+        {
+          "shot_id": "s08",
+          "scene": "ocean waves",
+          "motion_hint": "push",
+          "mood_zh": "轻柔",
+          "duration_hint": 3.988
+        },
+        {
+          "shot_id": "s09",
+          "scene": "mountain lake",
+          "motion_hint": "static",
+          "mood_zh": "恬静",
+          "duration_hint": 3.988
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "role": "climax",
+      "music_start": 36.68,
+      "music_end": 60.0,
+      "energy": 0.6384,
+      "shot_count": 7,
+      "shots": [
+        {
+          "shot_id": "s10",
+          "scene": "island",
+          "motion_hint": "static",
+          "mood_zh": "宁静",
+          "duration_hint": 3.331
+        },
+        {
+          "shot_id": "s11",
+          "scene": "mountain range",
+          "motion_hint": "aerial",
+          "mood_zh": "辽阔",
+          "duration_hint": 3.331
+        },
+        {
+          "shot_id": "s12",
+          "scene": "sea coast",
+          "motion_hint": "pan",
+          "mood_zh": "悠远",
+          "duration_hint": 3.331
+        },
+        {
+          "shot_id": "s13",
+          "scene": "ocean waves",
+          "motion_hint": "push",
+          "mood_zh": "轻柔",
+          "duration_hint": 3.331
+        },
+        {
+          "shot_id": "s14",
+          "scene": "mountain lake",
+          "motion_hint": "static",
+          "mood_zh": "恬静",
+          "duration_hint": 3.331
+        },
+        {
+          "shot_id": "s15",
+          "scene": "island",
+          "motion_hint": "static",
+          "mood_zh": "宁静",
+          "duration_hint": 3.331
+        },
+        {
+          "shot_id": "s16",
+          "scene": "mountain range",
+          "motion_hint": "aerial",
+          "mood_zh": "辽阔",
+          "duration_hint": 3.331
+        }
+      ]
+    }
+  ],
+  "generator": {
+    "mode": "glm",
+    "model": "glm-4-flash",
+    "note": "",
+    "at": "2026-10-27T20:35:14"
+  }
+}

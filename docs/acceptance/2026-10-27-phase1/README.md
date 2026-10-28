@@ -2,6 +2,13 @@
 
 对照审查清单（第二轮验收报告第 6 节）的逐项运行证据。审查者可按链接独立复核。
 
+> **路径说明（2026-10-28 补充）**：本目录是历史记录，保持原样不改写。其中
+> `timeline.json` / `music_map.json` 的音乐字段仍指向生成时的本机曲库
+> `C:\Users\15804\ZCodeProject\bili-autopost-sau\bgm\hopeful\Awake [johnfrantz17].mp3`。
+> 要一份能换机器核验的等价版本，见 [`../2026-10-28-portable/`](../2026-10-28-portable/README.md)：
+> 同一份 16 镜头记录，路径改写为包内相对路径，逐文件 SHA256 记录，可用
+> `python cli.py verify-evidence` 离线核验。
+
 ## 1. 自动化测试真实通过（不止配置了 CI）
 
 - CI run [40511357813](https://github.com/zhaohongjun20-creator/scenic-music-studio/actions/runs/40511357813)

@@ -1,0 +1,15 @@
+{
+  "theme_zh": "治愈系山海",
+  "mood": "治愈",
+  "duration_s": 60.0,
+  "platform": "bilibili",
+  "music": "media/music/8c6406342ddc8446a7f773ab.mp3",
+  "created_at": "2026-10-27T20:30:47",
+  "music_credit": {
+    "title": "Awake",
+    "artist": "johnfrantz17",
+    "license": "CC BY 3.0",
+    "source_url": "https://ccmixter.org/files/johnfrantz17/58272"
+  },
+  "seed": 7
+}
