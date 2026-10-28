@@ -3,6 +3,29 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 格式，
 版本号采用语义化（主.次.修订）。
 
+## [0.4.0] — 2026-10-28 · Remotion 混合渲染：动效片头/片尾
+
+### 新增
+- **动效卡叠加**：`cli motion <id>` 给成片叠 Remotion 动画标题卡（楷体呼吸
+  缩放 + 细线展开）与署名落版（逐行淡入），产出 `final_carded.mp4`；时长/
+  音乐/QC 不受影响（`src/motion.py`、`remotion/src/`）；
+- **降级链**：remotion/ 依赖或系统浏览器缺失时自动退回 ffmpeg drawtext
+  静态上字（降级不阻塞）；
+- 落版音乐署名自动推导：brief 的 `music_credit` → 曲库 manifest 按文件名
+  匹配 → 文件名 `Title [Artist]` 模式（`create --brief` 建项同样补全）；
+- 卡片缓存（`title_card.mov`/`outro_card.mov` 存在即命中）与 `--force`
+  强制重渲；
+- `tests/test_motion.py`：alpha 全链路回归（合成透明卡 → qtrle 回路 →
+  overlay 后背景透出/色块叠上/窗口外原样）+ 缓存/降级/署名推导单测；
+- 项目级 ZCode skill `.zcode/skills/scenic-motion-card`（用法与陷阱速查）。
+
+### 关键修复（过程中定位）
+- Remotion 官方推荐的 vp9+yuva420p webm 透明卡路线在本仓库所用 ffmpeg
+  构建上不可用：VP9 alpha 编解码双向失效（带透明度的 PNG 编出的 alpha
+  解回恒不透明），首版标题卡变成黑底整帧盖住风景。已改为 Remotion PNG
+  序列 → qtrle/argb MOV 中间格式，并用分区 PSNR 字节级验证（片头无字区
+  ≈43dB 透底、字带 16dB、中段零影响）。
+
 ## [0.3.0] — 2026-10-28 · 阶段一加固：可解释 · 可追溯 · 可盲评
 
 ### 新增

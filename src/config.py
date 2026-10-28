@@ -37,6 +37,11 @@ DEFAULTS = {
     "style": {
         "profile": "",
     },
+    "motion": {
+        "title_s": 3.0,             # 片头标题卡时长（秒）
+        "outro_s": 3.5,             # 片尾落版时长（秒）
+        "accent": "#e8d9b0",        # 点缀线颜色（暖金）
+    },
     "qc": {
         "max_black_seconds": 2.0, "max_volume_db": -0.5,
         "min_mean_volume_db": -45.0, "min_cut_snap_ratio": 0.8,

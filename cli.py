@@ -62,6 +62,8 @@ def cmd_create(args) -> None:
         if not brief.get("music"):
             _die("brief 缺少 music 字段")
         brief["music"] = str(Path(brief["music"]).resolve())
+        if not brief.get("music_credit"):
+            brief["music_credit"] = _resolve_credit(brief)
     else:
         if not args.theme or not args.music:
             _die("create 需要 --theme 与 --music（或改用 --brief brief.json）")
@@ -252,6 +254,57 @@ def cmd_prune_cache(args) -> None:
           f"{st['files']} 个文件，{st['bytes'] / 1e6:.0f}MB")
 
 
+def _resolve_credit(brief: dict) -> dict | None:
+    """动效落版用的音乐署名：brief 显式记录 → 曲库清单 → 文件名 Title [Artist]。"""
+    credit = brief.get("music_credit")
+    if isinstance(credit, dict) and credit.get("title"):
+        return credit
+    mp = brief.get("music")
+    if not mp:
+        return None
+    p = Path(mp)
+    # 曲库约定：bgm/<mood>/xx.mp3 旁边（上一级）有 manifest.json
+    manifest_file = p.parent.parent / "manifest.json"
+    if manifest_file.exists():
+        try:
+            tracks = json.loads(manifest_file.read_text(encoding="utf-8")) \
+                .get("tracks", [])
+            for t in tracks:
+                if t.get("file", "").replace("\\", "/").endswith(p.name):
+                    return {"title": t.get("title"), "artist": t.get("artist"),
+                            "license": t.get("license")}
+        except (OSError, ValueError):
+            pass
+    import re
+    m = re.match(r"(.+?)\s*\[([^\]]+)\]", p.stem)
+    if m:
+        return {"title": m.group(1), "artist": m.group(2)}
+    return None
+
+
+def cmd_motion(args) -> None:
+    from src import motion
+    pdir = store.project_dir(args.project)
+    final = pdir / "output" / "final.mp4"
+    if not final.exists():
+        _die(f"还没有成片，先 make: {final}")
+    from src.jsonio import load_json as _lj
+    brief = _lj(pdir / "brief.json") or {}
+    tline = _lj(pdir / "timeline.json") or {}
+    target_s = float(tline.get("target_s") or 0)
+    if target_s <= 0:
+        _die("timeline.json 缺 target_s")
+    credit = _resolve_credit(brief)
+    credit_line = (f"音乐：{credit['title']} — {credit['artist']}"
+                   + (f"（{credit['license']}）" if credit.get("license") else "")
+                   if credit else None)
+    result = motion.package_cards(args.project, load_config(), brief, final,
+                                  target_s, credit_line, force=args.force)
+    for s in result.get("skipped", []):
+        print(f"  降级提示: {s}")
+    print(f"动效打包完成（{result['mode']}）: {result['out']}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(prog="scenic-music-studio",
                                  description="音乐驱动的风景视频生产线")
@@ -345,6 +398,11 @@ def main() -> None:
     p = sub.add_parser("prune-cache", help="清理素材缓存（保留最新 N 个）")
     p.add_argument("--max-files", type=int, default=60)
     p.set_defaults(func=cmd_prune_cache)
+
+    p = sub.add_parser("motion", help="动效打包：片头标题卡 + 片尾落版叠加成片")
+    p.add_argument("project")
+    p.add_argument("--force", action="store_true", help="忽略缓存重新渲染")
+    p.set_defaults(func=cmd_motion)
 
     args = ap.parse_args()
     try:

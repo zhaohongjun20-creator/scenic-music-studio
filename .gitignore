@@ -20,3 +20,9 @@ delivery/
 .dsh-progress/
 docs/acceptance/2026-10-28-portable/media/
 migrate_historical_evidence.py
+
+# Remotion 动效卡（npm 依赖与本机浏览器缓存不进库；源码 remotion/src 提交）
+remotion/node_modules/
+
+# 本地调试产物
+tmp/

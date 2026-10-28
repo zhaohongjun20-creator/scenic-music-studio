@@ -111,6 +111,26 @@ QC 是确定性闸门：规格/时长 ±1.5s/静音/削波/黑帧/封面/时间�
 - 音乐分析为纯 numpy STFT 实现，不依赖 librosa/numba，后端可整体替换；
 - 制作与发布分离：产线只交付成片与上传物料，投稿动作永远由人执行。
 
+## 动效片头/片尾（Remotion 混合渲染）
+
+`make` 出 `final.mp4` 之后，可再叠加动画标题卡与署名落版，产出
+`final_carded.mp4`（时长/音乐/QC 不受影响）：
+
+```bash
+cd remotion && npm install && cd ..      # 首次：装 Remotion 依赖
+python cli.py motion project-002         # 之后：一条命令叠加
+python cli.py motion project-002 --force # 改过卡片样式/文案后强制重渲
+```
+
+- 架构：Remotion 只渲几秒的透明卡片（`remotion/src/TitleCard.tsx`、
+  `OutroCard.tsx`），ffmpeg 叠回成片两端；Remotion 不可用时自动降级
+  ffmpeg drawtext 静态上字（降级不阻塞）。
+- 中间格式是 qtrle/argb MOV——**不要**按 Remotion 官方文档改成 vp9
+  webm：本仓库所用 ffmpeg 构建的 VP9 alpha 编解码有缺陷，卡片会变黑底
+  盖住画面（回归用例 `tests/test_motion.py` 钉死）。
+- 落版音乐署名自动推导（brief 的 `music_credit` → 曲库 manifest →
+  文件名 `Title [Artist]`）。
+
 ## 测试
 
 ```bash
