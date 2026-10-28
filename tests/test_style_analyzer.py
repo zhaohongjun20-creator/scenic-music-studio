@@ -60,6 +60,12 @@ def test_boundary_detection_on_known_cuts(hardcut_video):
     for want in (2.0, 4.0, 6.0, 8.0, 10.0):
         assert any(abs(g - want) <= 0.35 for g in got), f"切点 {want}s 漏检: {got}"
     assert all(b["kind"] == "hard" for b in boundaries)   # 纯色硬切应为 hard
+    # 度量版本随样本落盘，避免 v1 等分镜密度与 v2 时间三分被混用
+    assert stats["metric_version"] == 2
+    dens = stats["density_by_third_cpm"]
+    assert len(dens) == 3
+    # 三段密度之和必须还原总切点数（12s、5 个切点），而不是恒等分
+    assert sum(dens) * stats["duration_s"] / 180 == pytest.approx(5, abs=0.05)
 
 
 def test_density_counts_cuts_in_time_thirds():
@@ -127,3 +133,21 @@ def test_style_changes_rhythm_and_transitions():
             assert tr["duration"] == 0.5
         elif s["transition_out"]:
             assert tr["duration"] == pytest.approx(0.13)
+
+
+def test_profile_declares_metric_version(monkeypatch):
+    """画像必须自带度量版本，否则 v1 的三段密度会被当成 v2 复用。"""
+    stats = {"file": "a.mp4", "duration_s": 10.0, "shots": 4,
+             "shots_per_minute": 24.0, "len_median": 2.5, "len_p25": 1.5,
+             "len_p75": 3.5, "len_min": 1.0, "len_max": 4.0,
+             "density_by_third_cpm": [18.0, 24.0, 30.0], "metric_version": 2,
+             "hard_cut_frac": 0.8,
+             "color": {"saturation": 0.4, "warmth": 0.0, "brightness": 0.35},
+             "motion": {"static_frac": 0.3, "medium_frac": 0.4, "strong_frac": 0.3}}
+    monkeypatch.setattr(style_analyzer, "analyze_sample", lambda p: dict(stats))
+    monkeypatch.setattr(style_analyzer, "analyze_music",
+                        lambda p, target_s=None: {"tempo": {"bpm": 120.0,
+                                                            "confidence": 1.0}})
+    prof = style_analyzer.build_profile(["a.mp4"], "频道")
+    assert prof["metric_version"] == 2
+    assert prof["samples"][0]["metric_version"] == 2

@@ -233,6 +233,9 @@ def build_profile(sample_paths: list[str], channel: str,
             continue
     import time as _t
     return {
+        # 让画像自带度量版本：没有此字段的旧画像，其 density_* 由 v1 等分镜
+        # 算法生成，与 v2 的时间三分段不可直接比较。
+        "metric_version": 2,
         "source": {"channel": channel,
                    "samples": [{"file": Path(p).name, "duration_s": s["duration_s"],
                                 "shots": s["shots"]} for p, s in zip(sample_paths, stats)],
