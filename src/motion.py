@@ -119,27 +119,39 @@ def render_card(comp: str, props: dict, out: Path, retries: int = 2) -> Path:
 def apply_overlays(final: Path, title: Path | None, outro: Path | None,
                    title_s: float, outro_s: float, target_s: float,
                    out: Path) -> Path:
-    """把标题卡（叠片头）与落版（叠片尾）overlay 到成片 → final_carded.mp4。"""
-    inputs, chains = ["-i", str(final)], []
+    """把标题卡（叠片头）与落版（叠片尾）overlay 到成片 → final_carded.mp4。
+
+    卡片用 setpts 平移到目标时间窗 + eof_action=pass 定点叠加。
+    不要改回 enable='between(t,a,b)'：enable 关闭期间 overlay 仍按帧序
+    消费次要输入，窗口在片尾时打开已消费到淡出的全透明末帧——落版整段
+    隐形且无任何报错（曾导致已发布成片片尾署名缺失）。
+    """
+    parts: list[str] = []
+    prev = "0:v"
     idx = 1
+    cards = []
     if title:
-        inputs += ["-i", str(title)]
-        chains.append((f"[{idx}:v]", 0.30, title_s))
+        cards.append((idx, 0.30))
         idx += 1
     if outro:
-        inputs += ["-i", str(outro)]
-        chains.append((f"[{idx}:v]", target_s - outro_s + 0.2, target_s - 0.05))
+        cards.append((idx, target_s - outro_s + 0.2))
         idx += 1
-    if not chains:
+    if not cards:
         raise MotionError("没有可叠加的动效卡")
-    fc, prev = [], "0:v"
-    for n, (label, start, end) in enumerate(chains):
-        outl = f"c{n}" if n < len(chains) - 1 else "vout"
-        fc.append(f"[{prev}]{label}overlay=0:0:"
-                  f"enable='between(t,{start:.2f},{end:.2f})'[{outl}]")
-        prev = outl
+    for n, (card_idx, start) in enumerate(cards):
+        last = n == len(cards) - 1
+        parts.append(f"[{card_idx}:v]setpts=PTS-STARTPTS+{start:.2f}/TB[card{n}]")
+        parts.append(f"[{prev}][card{n}]overlay=eof_action=pass"
+                     f"[{'vout' if last else f'c{n}'}]")
+        prev = f"c{n}"
+    fc = ";".join(parts)
+    inputs = ["-i", str(final)]
+    if title:
+        inputs += ["-i", str(title)]
+    if outro:
+        inputs += ["-i", str(outro)]
     cmd = [ffmpeg_exe(), "-y", "-hide_banner", "-loglevel", "error", *inputs,
-           "-filter_complex", ";".join(fc),
+           "-filter_complex", fc,
            "-map", "[vout]", "-map", "0:a?",
            "-c:v", "libx264", "-preset", "veryfast", "-crf", "19",
            "-pix_fmt", "yuv420p", "-c:a", "copy",

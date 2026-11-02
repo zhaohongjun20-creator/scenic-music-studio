@@ -3,6 +3,17 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 格式，
 版本号采用语义化（主.次.修订）。
 
+## [0.4.1] — 2026-11-02 · 修复片尾落版隐形
+
+### 修复
+- **片尾落版整段隐形**：`apply_overlays` 原用 `enable='between(t,a,b)'` 定点
+  叠加，但 enable 关闭期间 overlay 仍按帧序消费卡片输入——窗口在片尾时
+  卡片已被"播完"，重复的淡出全透明末帧让落版不可见且无任何报错
+  （0.4.0 已发布的动效版成片受影响，片头标题卡因窗口在片头恰好同步而正常）。
+  改为 `setpts` 平移卡片时间戳 + `eof_action=pass` 的定点叠加标准写法；
+- 新增回归用例 `test_overlay_outro_card_visible_at_tail`：片尾窗口内卡片
+  必须真的可见（旧实现下必红）。
+
 ## [0.4.0] — 2026-10-28 · Remotion 混合渲染：动效片头/片尾
 
 ### 新增

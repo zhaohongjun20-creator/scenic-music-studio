@@ -119,6 +119,28 @@ def test_overlay_transparent_card_keeps_background(tmp_path):
     assert corner2[0] > 90, "enable 窗口外被改动"
 
 
+def test_overlay_outro_card_visible_at_tail(tmp_path):
+    """片尾窗口的卡必须真的出现——钉死 enable 消费 bug（落版曾整段隐形）。
+
+    旧实现 enable='between(t,a,b)' 在窗口打开前就按帧序消费卡片输入，
+    片尾窗口打开时卡片已"播完"，重复的全透明末帧让落版整段隐形且无报错。
+    """
+    main = tmp_path / "main.mp4"
+    card = tmp_path / "card.mov"
+    out = tmp_path / "out.mp4"
+    make_main_video(main, seconds=3.0)
+    make_card_mov(card, frames=12)                   # 1.2s @10fps
+
+    motion.apply_overlays(main, None, card,
+                          title_s=0.0, outro_s=0.5, target_s=3.0, out=out)
+
+    tail = _rgba(str(out), t=2.8)                    # 窗口内(2.7-2.95)：色块=红
+    r0, g0, b0 = tail[(17 * W + 30) * 4: (17 * W + 30) * 4 + 3]
+    assert r0 > 150 and g0 < 100 and b0 < 100, "片尾窗口内色块没有叠上（隐形卡回归）"
+    corner = tail[(2 * W + 2) * 4: (2 * W + 2) * 4 + 3]
+    assert corner[0] > 90, f"透明角落被盖住: rgb={tuple(corner)}"
+
+
 def test_drawtext_escape():
     assert motion._esc("a:b'c,d%e\\f") == "a\\:b\\\\'c\\,d\\%e\\\\f"
 
