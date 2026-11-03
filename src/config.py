@@ -42,6 +42,10 @@ DEFAULTS = {
         "outro_s": 3.5,             # 片尾落版时长（秒）
         "accent": "#e8d9b0",        # 点缀线颜色（暖金）
     },
+    "review": {
+        "workbuddy_cmd": "",        # 代审 CLI 包装；空 = bash tools/workbuddy_review.sh
+        "timeout_s": 500,           # 单轮代审超时（秒）
+    },
     "qc": {
         "max_black_seconds": 2.0, "max_volume_db": -0.5,
         "min_mean_volume_db": -45.0, "min_cut_snap_ratio": 0.8,

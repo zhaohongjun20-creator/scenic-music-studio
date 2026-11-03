@@ -305,6 +305,38 @@ def cmd_motion(args) -> None:
     print(f"动效打包完成（{result['mode']}）: {result['out']}")
 
 
+def cmd_review_workbuddy(args) -> None:
+    """workbuddy 代审：抽帧 → CLI 审片 → 判词落盘。fail/unavailable 退出码 1。"""
+    from src import workbuddy_review
+    pdir = store.project_dir(args.project)
+    # 优先审 final_carded（动效叠加后的真实交付物）；还没有动效版则退回 final
+    final = pdir / "output" / "final_carded.mp4"
+    if not final.exists():
+        final = pdir / "output" / "final.mp4"
+    if not final.exists():
+        _die("还没有成片，先 make: " + str(pdir / "output" / "final.mp4"))
+    brief = load_json(pdir / "brief.json") or {}
+    tline = load_json(pdir / "timeline.json") or {}
+    target_s = float(tline.get("target_s") or 0)
+    if target_s <= 0:
+        _die("timeline.json 缺 target_s")
+    credit = _resolve_credit(brief)
+    credit_lines = []
+    if credit:
+        credit_lines.append(f"音乐: {credit['title']} — {credit['artist']}"
+                            + (f" ({credit['license']})" if credit.get("license") else ""))
+    credit_lines.append("视频素材: Pexels · Pexels License")
+    print(f"审片对象: {final.name}")
+    data = workbuddy_review.review_project(
+        args.project, load_config(), final, target_s,
+        theme=brief.get("theme_zh", "自然风景"), credit_lines=credit_lines)
+    print(f"workbuddy 审片结论: {data['latest_verdict']}（第 {len(data['rounds'])} 轮）")
+    print(f"判词存档: {pdir / 'output' / 'review_workbuddy.json'}")
+    if data["latest_verdict"] != "pass":
+        sys.exit(1)
+    print("下一步：过审可投稿；正式 approve 账本仍需用户本人签审")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(prog="scenic-music-studio",
                                  description="音乐驱动的风景视频生产线")
@@ -403,6 +435,10 @@ def main() -> None:
     p.add_argument("project")
     p.add_argument("--force", action="store_true", help="忽略缓存重新渲染")
     p.set_defaults(func=cmd_motion)
+
+    p = sub.add_parser("review-workbuddy", help="workbuddy 代审：抽帧审片出判词（fail 退出码 1）")
+    p.add_argument("project")
+    p.set_defaults(func=cmd_review_workbuddy)
 
     args = ap.parse_args()
     try:

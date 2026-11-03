@@ -3,6 +3,20 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 格式，
 版本号采用语义化（主.次.修订）。
 
+## [0.5.0] — 2026-11-03 · 代审闸门：workbuddy 审片入列
+
+### 新增
+- **`cli review-workbuddy <id>`**：投稿前的内容维度代审——抽帧（片头卡/
+  均布采样/片尾落版）交本机 WorkBuddy/CodeBuddy CLI 审片（人物/动物穿帮、
+  主题契合、坏帧过曝、片头片尾完整性），判词多轮累积落盘
+  `output/review_workbuddy.json`；fail/unavailable 退出码 1，便于脚本闸门
+  （`src/workbuddy_review.py`、`tools/workbuddy_review.sh`）；
+- 代审不可用（CLI/网关缺失）时 verdict=unavailable，不阻塞发布，人工兜底；
+  正式 `approve` 账本仍要求用户本人签审，代审不代签；
+- 实战验证：project-004（主题偏离+坏帧）被判 fail 未发布；project-005 经
+  keywords 钉主题 + 镜头排除修复后两轮过审发布
+  （BV1LQ4M69EvU《落日海平线》）。
+
 ## [0.4.1] — 2026-11-02 · 修复片尾落版隐形
 
 ### 修复
