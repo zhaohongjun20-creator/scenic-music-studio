@@ -13,4 +13,9 @@ for p in tencent-docs-plugin workbuddy-docx workbuddy-pptx workbuddy-sheetagent;
   [ -n "$V" ] && ARGS="$ARGS --plugin-dir $(cygpath -w "$WB_PLUGINS/$p/$V")"
 done
 
-exec codebuddy -p $ARGS "$@"
+# 模型：默认 glm-5.3（账号云端路由；无需 WorkBuddy 桌面端本地网关）。
+# 2026-11 起 .codebuddy/models.json（本地 magpie 网关路由）已改名 .bak，
+# CLI 直接走账号云端模型；可用 WORKBUDDY_MODEL 环境变量覆盖。
+MODEL="${WORKBUDDY_MODEL:-glm-5.3}"
+
+exec codebuddy -p $ARGS --model "$MODEL" "$@"

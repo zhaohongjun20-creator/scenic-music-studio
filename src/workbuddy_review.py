@@ -91,6 +91,17 @@ def parse_verdict(text: str) -> tuple[str, str]:
     return verdict, text
 
 
+def _bash_exe() -> str:
+    """解析真正的 Git Bash：Windows 下裸 `bash` 会命中 WSL 的 bash.exe
+    （无分发版直接 rc=1），必须优先找 Git 安装目录。"""
+    for p in (r"C:\Program Files\Git\bin\bash.exe",
+              r"C:\Program Files\Git\usr\bin\bash.exe",
+              r"C:\Program Files (x86)\Git\bin\bash.exe"):
+        if Path(p).exists():
+            return p
+    return "bash"                               # POSIX 或已自行排好 PATH 的环境
+
+
 def _run_cli(cmd: str, prompt: str, timeout: int) -> str:
     """调包装脚本（--output-format json），返回 result 文本。"""
     with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False,
@@ -98,14 +109,21 @@ def _run_cli(cmd: str, prompt: str, timeout: int) -> str:
         prompt_file = Path(f.name)
         f.write(prompt)
     try:
-        argv = [*cmd.split(), "--output-format", "json", prompt_file.read_text(encoding="utf-8")]
+        argv = cmd.split()
+        if argv and argv[0] == "bash":
+            argv[0] = _bash_exe()
+        argv += ["--output-format", "json", prompt_file.read_text(encoding="utf-8")]
         r = subprocess.run(argv, capture_output=True, text=True,
                            encoding="utf-8", errors="replace", timeout=timeout,
                            cwd=ROOT)
         if r.returncode != 0:
             raise ReviewError(f"workbuddy CLI 失败 rc={r.returncode}: "
                               f"{(r.stderr or r.stdout or '')[-300:]}")
-        return _extract_result(r.stdout)
+        result = _extract_result(r.stdout)
+        if not result.strip():
+            # rc=0 但空输出：常见于模型网关（WorkBuddyAI 3425）掉线，错误只进 stderr
+            raise ReviewError(f"workbuddy CLI 空结果（疑似网关掉线）: {r.stderr[-200:]}")
+        return result
     finally:
         prompt_file.unlink(missing_ok=True)
 
