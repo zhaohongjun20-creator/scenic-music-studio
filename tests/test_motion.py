@@ -71,7 +71,8 @@ def make_card_mov(path, frames: int = 6) -> None:
             stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         for i in range(frames):
             enc.stdin.write((Path(td) / f"element-{i:02d}.png").read_bytes())
-        enc.stdin.close()
+        # 不要在 communicate 之前关闭 stdin。CPython 3.12（POSIX）会再 flush
+        # 这个已关闭的管道，抛 ValueError；3.13 才忽略。交给 communicate 去关。
         _, err = enc.communicate(timeout=120)
         assert enc.returncode == 0, err
 

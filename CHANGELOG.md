@@ -16,6 +16,12 @@
   未安装 opencv 或初始化失败时 **放行**，素材记 `people_check=unavailable`。
   单测注入假检测器，CI 不需要 GPU。
 
+### 修复
+- **qtrle 管道在 Python 3.12 上崩溃**：`make_card_mov` / `render_card` 在
+  `communicate()` 之前关掉 ffmpeg 的 stdin。CPython 3.12 的 POSIX 实现会再
+  flush 这个已关闭的管道，抛 `ValueError: flush of closed file`（3.13 已忽略，
+  故只有 Ubuntu 3.12 的 CI 变红）。改为让 `communicate()` 自己关闭 stdin。
+
 ## [0.5.0] — 2026-11-03 · 代审闸门：workbuddy 审片入列
 
 ### 新增

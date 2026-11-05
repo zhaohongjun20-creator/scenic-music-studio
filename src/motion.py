@@ -104,9 +104,10 @@ def render_card(comp: str, props: dict, out: Path, retries: int = 2) -> Path:
         try:
             for f in frames:
                 enc.stdin.write(f.read_bytes())
-            enc.stdin.close()
         except BrokenPipeError:
             pass
+        # 不要在 communicate 之前关闭 stdin。CPython 3.12（POSIX）会再 flush
+        # 这个已关闭的管道，抛 ValueError；3.13 才忽略。交给 communicate 去关。
         _, err = enc.communicate(timeout=300)
         if enc.returncode != 0 or not out.exists() or out.stat().st_size < 1_000:
             raise MotionError(f"qtrle 编码失败: {(err or b'')[-300:]!r}")
