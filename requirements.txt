@@ -7,3 +7,4 @@ imageio-ffmpeg==0.6.0     # ffmpeg 兜底（PATH 里没有 ffmpeg 时用）
 
 # 开发/测试
 pytest==9.1.1
+opencv-python-headless<5   # 人物预检（HOG），5.x 移除了 HOGDescriptor
