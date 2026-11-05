@@ -99,7 +99,7 @@ def _asset_state(tline: dict) -> list[dict]:
 def _material_requests(tline: dict) -> dict:
     return {str(s["index"]): provenance.content_fingerprint(
         {k: s.get(k) for k in ("index", "scene", "render_length", "revision",
-                               "exclude_assets", "redo_note")})
+                               "exclude_assets", "redo_note", "motion_hint")})
             for s in tline["shots"]}
 
 
