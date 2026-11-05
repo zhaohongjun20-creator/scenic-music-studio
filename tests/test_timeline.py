@@ -34,6 +34,16 @@ def synth_storyboard(mm) -> dict:
         sections, ["mountain", "sea"], CFG_TL["min_shot_s"])}
 
 
+def test_timeline_copies_motion_hint():
+    mm = synth_music_map()
+    tline = tl.plan_from_storyboard(synth_storyboard(mm), mm, CFG_TL, CFG_VIDEO,
+                                    rng=random.Random(7))
+    hints = [s["motion_hint"] for s in tline["shots"]]
+    assert hints[0] == "aerial"          # 开场
+    assert "static" in hints
+    assert set(hints) <= {"aerial", "static", "push", "pan"}
+
+
 def test_timeline_invariants():
     mm = synth_music_map()
     tline = tl.plan_from_storyboard(synth_storyboard(mm), mm, CFG_TL, CFG_VIDEO,

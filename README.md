@@ -109,6 +109,9 @@ QC 是确定性闸门：规格/时长 ±1.5s/静音/削波/黑帧/封面/时间�
 - 五段情绪模型（opening/build/climax/settle/ending）的镜头时长区间与
   xfade 重叠回补公式是本项目自身调参的结果，全部在 `src/timeline.py`；
 - 音乐分析为纯 numpy STFT 实现，不依赖 librosa/numba，后端可整体替换；
+- Pexels 入点看导演的 `motion_hint`（航拍/推进/摇镜要运动且避开硬切，静态要
+  低运动）。人物筛选在成片下载之前，用入点附近的预览帧；没装 opencv 时这一关
+  放行并在素材上标明（`src/shot_window.py`）；
 - 制作与发布分离：产线只交付成片与上传物料，投稿动作永远由人执行。
 
 ## 动效片头/片尾（Remotion 混合渲染）

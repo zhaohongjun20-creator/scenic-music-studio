@@ -6,6 +6,8 @@
   被哪些镜头使用——发布争议时可追溯；
 - 相邻 N 个镜头不重复用同一素材；redo-shot 时被换掉的素材进入该镜头
   的排除名单，不会再次选中；
+- 接受 Pexels 候选之前先看预览帧：按 motion_hint 选入点，并在入点附近
+  拒掉有人的画面。被拒的候选不下载 mp4，直接试下一条；
 - offline 模式生成本地占位视频（testsrc2 + 按检索词哈希调色），
   全链可离线跑通，用于开发与测试，不消耗 API 额度。
 """
@@ -21,7 +23,10 @@ import requests
 
 from src.audio_io import ffmpeg_exe, ffprobe_exe
 from src.jsonio import load_json, save_json
-from src.store import MATERIALS_DIR
+from src.shot_window import (choose_src_in, clamp_src_in, detector_available,
+                             frame_near, legacy_src_in, load_preview_samples,
+                             resolve_people_detector)
+from src.store import MATERIALS_DIR, StoreError, project_dir
 
 PEXELS_SEARCH = "https://api.pexels.com/videos/search"
 CACHE_DIR = MATERIALS_DIR / "cache"
@@ -153,11 +158,34 @@ def _download(link: str, dest: Path, retries: int = 3) -> None:
 # ---------------------------------------------------------------- 素材对象
 
 def _src_in(duration: float, need: float) -> float:
-    """默认从素材前 1/3 处取，保证剩余长度够截满；不够就贴尾部。"""
-    third = duration / 3.0
-    if third + need <= duration - 0.2:
-        return round(third, 3)
-    return round(max(0.0, duration - need - 0.2), 3)
+    """没有运动样本时的入点：素材前 1/3，剩余不够就贴尾部。"""
+    return legacy_src_in(duration, need)
+
+
+def _storyboard_hints(pid: str) -> list[str]:
+    """时间轴还没带上 motion_hint 时，按镜头顺序回读导演计划。"""
+    try:
+        data = load_json(project_dir(pid) / "storyboard.json", {}) or {}
+    except (StoreError, OSError, TypeError, ValueError):
+        return []
+    hints = []
+    for section in data.get("sections") or []:
+        if not isinstance(section, dict):
+            continue
+        for shot in section.get("shots") or []:
+            if isinstance(shot, dict):
+                hints.append(str(shot.get("motion_hint") or ""))
+    return hints
+
+
+def _motion_hint(shot: dict, hints: list[str]) -> str:
+    hint = str(shot.get("motion_hint") or "").strip().lower()
+    if hint:
+        return hint
+    index = shot.get("index")
+    if isinstance(index, int) and 0 <= index < len(hints):
+        return str(hints[index] or "").strip().lower()
+    return ""
 
 
 def _placeholder(shot: dict) -> dict:
@@ -244,9 +272,62 @@ def prune_cache(max_files: int) -> int:
 
 # ---------------------------------------------------------------- 分配
 
+def _screen_candidate(cand: dict, vid: str, need: float, hint: str,
+                      detector, loader) -> tuple[str, dict | None]:
+    """下载前筛选。返回 ('ok', asset) / ('people', None) / ('download', None)。
+
+    people：有人，或检测器可用但抽不到入点附近的帧。不调用下载。
+    download：文件本身失败，可以试下一条。
+    """
+    video = cand["video"]
+    duration = float(video.get("duration") or 0)
+    try:
+        samples = list(loader(video) or [])
+    except Exception:
+        samples = []
+    src_in, rule = choose_src_in(duration, need, hint, samples)
+    if not detector_available(detector):
+        verdict_status = "unavailable"
+        verdict_detail = getattr(detector, "detail", "") or ""
+    else:
+        near = frame_near(samples, src_in, need)
+        if near is None:
+            return "people", None
+        try:
+            verdict = detector.check(near[1])
+        except Exception:
+            return "people", None
+        if verdict.status == "rejected":
+            return "people", None
+        if verdict.status == "unavailable":
+            verdict_status = "unavailable"
+            verdict_detail = verdict.detail
+        elif verdict.status == "clean":
+            verdict_status = "clean"
+            verdict_detail = ""
+        else:
+            return "people", None
+    try:
+        asset = _materialize(cand, vid)
+    except MaterialError:
+        return "download", None
+    probed = float(asset.get("duration_s") or duration)
+    asset["src_in"] = clamp_src_in(src_in, probed, need)
+    asset["src_in_rule"] = rule
+    asset["motion_hint"] = hint
+    asset["people_check"] = verdict_status
+    if verdict_status == "unavailable" and verdict_detail:
+        asset["people_check_note"] = str(verdict_detail)[:200]
+    return "ok", asset
+
+
 def assign_assets(pid: str, timeline: dict, cfg: dict, keys: dict,
-                  offline: bool = False) -> dict:
-    """为每个镜头挑选素材并填 shot["asset"]。就地修改并返回 timeline。"""
+                  offline: bool = False, *, people_detector=None,
+                  preview_loader=None) -> dict:
+    """为每个镜头挑选素材并填 shot["asset"]。就地修改并返回 timeline。
+
+    people_detector / preview_loader 供测试注入。默认检测器不可用时放行。
+    """
     if not offline and not keys.get("pexels"):
         raise MaterialError("缺少 PEXELS_API_KEY（或改用 --offline 模式）")
     mat = cfg["material"]
@@ -254,6 +335,9 @@ def assign_assets(pid: str, timeline: dict, cfg: dict, keys: dict,
     index = load_json(INDEX_PATH, []) or []
     by_id = {e.get("id"): e for e in index}
     api_cache: dict[str, dict] = {}
+    detector = None if offline else resolve_people_detector(people_detector)
+    loader = preview_loader or load_preview_samples
+    hints = [] if offline else _storyboard_hints(pid)
 
     for shot in timeline["shots"]:
         need = float(shot["render_length"])
@@ -261,7 +345,9 @@ def assign_assets(pid: str, timeline: dict, cfg: dict, keys: dict,
         asset = None
         if offline:
             asset = _placeholder(shot)
+            asset["src_in"] = _src_in(float(asset["duration_s"]), need)
         else:
+            hint = _motion_hint(shot, hints)
             query = shot["scene"]
             if query not in api_cache:
                 api_cache[query] = _search(keys["pexels"], query,
@@ -269,22 +355,31 @@ def assign_assets(pid: str, timeline: dict, cfg: dict, keys: dict,
             cands = _candidates(api_cache[query], need,
                                 float(mat["min_source_duration_s"]),
                                 int(mat["max_height"]))
-            for c in cands:
-                vid = f"pexels-{c['video']['id']}"
-                if vid in exclude or vid in recent:
+            deferred = []
+            for cand in cands:
+                vid = f"pexels-{cand['video']['id']}"
+                if vid in exclude:
                     continue
-                try:
-                    asset = _materialize(c, vid)
-                except MaterialError:
-                    continue                # 这个候选坏了/网断了：换下一个
-                break
-            if asset is None and cands:      # 全部撞车：放宽近邻限制
-                asset = _materialize(cands[0], f"pexels-{cands[0]['video']['id']}")
+                if vid in recent:
+                    deferred.append(cand)      # 近邻去重先让路，人的否决优先
+                    continue
+                kind, asset = _screen_candidate(
+                    cand, vid, need, hint, detector, loader)
+                if kind == "ok":
+                    break
+                asset = None
+            if asset is None:                  # 放宽近邻，仍不接受有人的候选
+                for cand in deferred:
+                    vid = f"pexels-{cand['video']['id']}"
+                    kind, asset = _screen_candidate(
+                        cand, vid, need, hint, detector, loader)
+                    if kind == "ok":
+                        break
+                    asset = None
         if asset is None:
             raise MaterialError(
                 f"镜头 {shot['index']}（{shot['scene']}）无可用素材，"
                 f"可改检索词后重跑")
-        asset["src_in"] = _src_in(float(asset["duration_s"]), need)
         recent.append(asset["id"])
         shot["asset"] = asset
         rec = by_id.get(asset["id"])
