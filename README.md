@@ -141,11 +141,14 @@ python cli.py motion project-002 --force # 改过卡片样式/文案后强制重
 闸门，这里补内容维度）：
 
 ```bash
-python cli.py review-workbuddy project-005   # fail/unavailable 退出码 1
+python cli.py review-workbuddy project-005   # fail 退出码 1（未达轮次上限时）
+python cli.py review-workbuddy project-005 --max-rounds 2   # 自定义轮次上限
 ```
 
-判词多轮累积落盘 `projects/<id>/output/review_workbuddy.json`。依赖：
-codebuddy CLI 已扫码登录 + WorkBuddy 桌面端在线（模型网关 127.0.0.1:3425），
+判词多轮累积落盘 `projects/<id>/output/review_workbuddy.json`。**轮次上限
+默认 3**（用户政策）：审片是闸门不是无限循环——第 3 轮判词的修改落地后
+直接发布，不再复审（退出码 0，账本标 `policy_final`），最终画质由人工兜底。
+依赖：codebuddy CLI 已扫码登录（走账号云端模型，默认 glm-5.3），
 包装脚本 `tools/workbuddy_review.sh`（可用 config `review.workbuddy_cmd`
 覆盖）。代审不可用时 verdict=unavailable，不阻塞发布，人工审片兜底。
 注意：正式 `approve` 账本要求用户本人签审，代审不代签。

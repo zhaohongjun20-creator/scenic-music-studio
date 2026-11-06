@@ -89,3 +89,29 @@ def test_legacy_single_round_migration(tmp_path):
     rounds = r if isinstance(r, list) else [prev]
     rounds.append({"verdict": "pass"})
     assert rounds[0]["verdict"] == "fail" and rounds[1]["verdict"] == "pass"
+
+
+def test_max_rounds_policy_marker(tmp_path, monkeypatch):
+    """轮次上限政策：第 max_rounds 轮起标 policy_final（修改后直接发布）。"""
+    import subprocess
+    from src import workbuddy_review as wr
+    from src.audio_io import ffmpeg_exe
+
+    final = tmp_path / "final.mp4"
+    r = subprocess.run([ffmpeg_exe(), "-y", "-loglevel", "error",
+                        "-f", "lavfi", "-i", "color=c=0x808080:s=64x36:d=62:r=10",
+                        "-pix_fmt", "yuv420p", str(final)], capture_output=True)
+    assert r.returncode == 0
+    monkeypatch.setattr(wr, "_run_cli",
+                        lambda *a, **k: "有瑕疵\nVERDICT: fail - 某帧跑题")
+
+    d1 = wr.review_project("p", {"review": {}}, final, 60.0, "测试",
+                           ["音乐: X"], max_rounds=3)
+    assert d1["policy_final"] is False and len(d1["rounds"]) == 1
+    d2 = wr.review_project("p", {"review": {}}, final, 60.0, "测试",
+                           ["音乐: X"], max_rounds=3)
+    d3 = wr.review_project("p", {"review": {}}, final, 60.0, "测试",
+                           ["音乐: X"], max_rounds=3)
+    assert d3["policy_final"] is True
+    assert "不再复审" in d3["policy_note"]
+    assert d3["latest_verdict"] == "fail"     # 判词如实保留，只是政策放行

@@ -306,7 +306,11 @@ def cmd_motion(args) -> None:
 
 
 def cmd_review_workbuddy(args) -> None:
-    """workbuddy 代审：抽帧 → CLI 审片 → 判词落盘。fail/unavailable 退出码 1。"""
+    """workbuddy 代审：抽帧 → CLI 审片 → 判词落盘。
+
+    轮次上限 --max-rounds（默认 3，用户政策）：第 N 轮判词的修改落地后
+    不再复审，直接发布——审片是闸门不是无限循环，最终画质由人工兜底。
+    """
     from src import workbuddy_review
     pdir = store.project_dir(args.project)
     # 优先审 final_carded（动效叠加后的真实交付物）；还没有动效版则退回 final
@@ -329,12 +333,19 @@ def cmd_review_workbuddy(args) -> None:
     print(f"审片对象: {final.name}")
     data = workbuddy_review.review_project(
         args.project, load_config(), final, target_s,
-        theme=brief.get("theme_zh", "自然风景"), credit_lines=credit_lines)
-    print(f"workbuddy 审片结论: {data['latest_verdict']}（第 {len(data['rounds'])} 轮）")
+        theme=brief.get("theme_zh", "自然风景"), credit_lines=credit_lines,
+        max_rounds=args.max_rounds)
+    verdict = data["latest_verdict"]
+    rounds = len(data["rounds"])
+    print(f"workbuddy 审片结论: {verdict}（第 {rounds} 轮）")
     print(f"判词存档: {pdir / 'output' / 'review_workbuddy.json'}")
-    if data["latest_verdict"] != "pass":
-        sys.exit(1)
-    print("下一步：过审可投稿；正式 approve 账本仍需用户本人签审")
+    if verdict == "pass" or verdict == "unavailable":
+        return
+    if rounds >= args.max_rounds:
+        print(f"已达审片轮次上限（{args.max_rounds} 轮）——按第 {rounds} 轮判词"
+              f"修改后可直接发布，不再复审（人工对最终成片兜底）")
+        return
+    sys.exit(1)
 
 
 def main() -> None:
@@ -436,8 +447,10 @@ def main() -> None:
     p.add_argument("--force", action="store_true", help="忽略缓存重新渲染")
     p.set_defaults(func=cmd_motion)
 
-    p = sub.add_parser("review-workbuddy", help="workbuddy 代审：抽帧审片出判词（fail 退出码 1）")
+    p = sub.add_parser("review-workbuddy", help="workbuddy 代审：抽帧审片出判词（fail 退出码 1；轮次上限默认 3）")
     p.add_argument("project")
+    p.add_argument("--max-rounds", type=int, default=3,
+                   help="审片轮次上限；达到后按本轮判词修改即发布，不再复审")
     p.set_defaults(func=cmd_review_workbuddy)
 
     args = ap.parse_args()

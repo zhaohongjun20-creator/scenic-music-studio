@@ -140,8 +140,13 @@ def _extract_result(stdout_json: str) -> str:
 
 
 def review_project(pid: str, cfg: dict, final: Path, target_s: float,
-                   theme: str, credit_lines: list[str]) -> dict:
-    """完整代审一轮：抽帧 → CLI 审片 → 判词落盘（多轮累积）。"""
+                   theme: str, credit_lines: list[str],
+                   max_rounds: int = 3) -> dict:
+    """完整代审一轮：抽帧 → CLI 审片 → 判词落盘（多轮累积）。
+
+    max_rounds 是用户设定的轮次上限：本轮序号 ≥ 上限时在存档里标记
+    policy_final=True（按本轮判词修改后直接发布，不再复审）。
+    """
     pdir = Path(final).parent
     qc_path = pdir / "qc_report.json"
     frames = extract_frames(final, frame_times(target_s),
@@ -173,6 +178,10 @@ def review_project(pid: str, cfg: dict, final: Path, target_s: float,
                    "verdict": verdict, "detail": detail,
                    "frames": [f.name for f in frames]})
     data = {"project": pid, "reviewer": "workbuddy-ai (codebuddy CLI)",
-            "latest_verdict": verdict, "rounds": rounds}
+            "latest_verdict": verdict, "max_rounds": max_rounds,
+            "policy_final": len(rounds) >= max_rounds,
+            "policy_note": ("轮次已达上限：按本轮判词修改后直接发布，不再复审"
+                            if len(rounds) >= max_rounds else ""),
+            "rounds": rounds}
     save_json(out, data)
     return data
